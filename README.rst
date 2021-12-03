@@ -38,3 +38,4 @@ If installed properly, a simple ``dctag`` should work. Otherwise (make sure
 the virtual environment is active)::
 
     python -m dctag
+
