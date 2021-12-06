@@ -30,6 +30,7 @@
       </widget>
       <widget class="QWidget" name="binary">
        <attribute name="title">
+
         <string>Binary Classification</string>
        </attribute>
       </widget>
