@@ -41,7 +41,7 @@ class DCTagSession:
         Upon initialization this class creates a .dctag file with the
         same file name stem as `path` to indicate that a DCTag session
         is in progress. This can be thought of as a file lock. It is a
-        precaution to prevent to people from working on the same file
+        precaution to prevent two people from working on the same file
         at the same time.
 
         The methods that alter the .rtdc file in this class are
@@ -59,7 +59,7 @@ class DCTagSession:
             #: Number of events in the dataset
             self.event_count = len(ds)
         #: Lock used internally to avoid writing to `history` and `scores`
-        #: while saving data in flush
+        #: while saving data in `flush`
         self.score_lock = threading.Lock()
         #: simple key-value dictionary of the current session history
         self.history = {}
