@@ -23,12 +23,12 @@
       <property name="currentIndex">
        <number>0</number>
       </property>
-      <widget class="QWidget" name="session">
+      <widget class="SessionView" name="session">
        <attribute name="title">
         <string>Session Info</string>
        </attribute>
       </widget>
-      <widget class="QWidget" name="binary">
+      <widget class="BinaryView" name="binary">
        <attribute name="title">
         <string>Binary Classification</string>
        </attribute>
@@ -43,7 +43,7 @@
      <x>0</x>
      <y>0</y>
      <width>1112</width>
-     <height>31</height>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -101,6 +101,20 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>BinaryView</class>
+   <extends>QWidget</extends>
+   <header>dctag.binary</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>SessionView</class>
+   <extends>QWidget</extends>
+   <header>dctag.session</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
