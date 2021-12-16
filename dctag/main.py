@@ -27,6 +27,7 @@ class DCTag(QtWidgets.QMainWindow):
         # Help menu
         self.actionSoftware.triggered.connect(self.on_action_software)
         self.actionAbout.triggered.connect(self.on_action_about)
+
         # if "--version" was specified, print the version and exit
         if "--version" in sys.argv:
             print(__version__)
