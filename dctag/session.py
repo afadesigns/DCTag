@@ -82,7 +82,7 @@ class DCTagSession:
         self.close()
 
     def close(self):
-        """Close this session"""
+        """Close this session, flushing everything to `self.path`"""
         self.flush()
         self.path_lock.unlink()
 
@@ -97,9 +97,9 @@ class DCTagSession:
             try:
                 self.write_scores(clear_scores=True)
                 self.write_history(clear_history=True)
-            except BaseException:
+            except BaseException as exc:
                 raise SessionWriteError(
-                    f"Could not write to session {self.path}!")
+                    f"Could not write to session {self.path}!") from exc
 
     def set_score(self, feature, index, value):
         """Set the feature score of an event in the current dataset
@@ -118,8 +118,10 @@ class DCTagSession:
         -----
         This method is thread-safe.
         """
-        assert feature.startswith("ml_score_")
-        assert len(feature) == len("ml_score_???")
+        if (not feature.startswith("ml_score_") or
+                len(feature) != len("ml_score_???")):
+            raise ValueError(
+                f"Expected 'ml_score_xxx' feature, got '{feature}'!")
         with self.score_lock:
             # scores
             feat_list = self.scores.setdefault(feature, [])
@@ -151,10 +153,12 @@ class DCTagSession:
         if self.history:
             with dclab.RTDCWriter(self.path, mode="append") as hw:
                 hw.store_log(
+                    "dctag-history",
                     time.strftime(
                         f"DCTag history %Y-%m-%d %H:%M:%S for '{self.user}'"))
                 for key in sorted(self.history.keys()):
-                    hw.store_log(f" {key}: {self.history[key]}")
+                    hw.store_log("dctag-history",
+                                 f" {key}: {self.history[key]}")
             if clear_history:
                 # clear history
                 self.history.clear()
