@@ -13,13 +13,23 @@ import dclab
 import h5py
 import numpy as np
 
+from ._version import version
 
-class SessionLockedError(BaseException):
+
+class DCTagSessionError(BaseException):
+    pass
+
+
+class DCTagSessionLockedError(DCTagSessionError):
     """Cannot load the session, because it is locked by another process"""
 
 
-class SessionWriteError(BaseException):
+class DCTagSessionWriteError(DCTagSessionError):
     """Raised when it is not possible to write to a session"""
+
+
+class DCTagSessionWrongUserError(DCTagSessionError):
+    """Raised when the session user does not match"""
 
 
 class DCTagSession:
@@ -71,12 +81,35 @@ class DCTagSession:
         self.path_lock = self.path.with_suffix(".dctag")
         #: Session user
         self.user = user.strip()
+        #: scoring features that are linked for labeling
+        self.linked_features = linked_features or []
+        # claim this file
+        with h5py.File(self.path, "a") as h5:
+            if "dctag-history" in h5.require_group("logs"):
+                h5userstr = h5["logs"]["dctag-history"][0]
+                if isinstance(h5userstr, bytes):
+                    h5userstr = h5userstr.decode("utf-8")
+                h5user = h5userstr.split(":")[1].strip()
+                if h5user != self.user:
+                    raise DCTagSessionWrongUserError(
+                        f"Expected user '{self.user}' in '{self.path}', but "
+                        + f"got '{h5user}'!")
+            else:
+                with dclab.RTDCWriter(h5) as hw:
+                    hw.store_log("dctag-history", f"User: {self.user}")
+            # While we are at it, note down the linked features in this
+            # particular session.
+            with dclab.RTDCWriter(h5) as hw:
+                hw.store_log(
+                    "dctag-history",
+                    [time.strftime(f"New session at %Y-%m-%d %H:%M:%S"),
+                     f"DCTag {version}",
+                     f"Linked features: {self.linked_features}",
+                    ])
         # determine length of the dataset
         with dclab.new_dataset(self.path) as ds:
             #: Number of events in the dataset
             self.event_count = len(ds)
-        #: scoring features that are linked for labeling
-        self.linked_features = linked_features or []
         #: The internal scores cache is a dict with numpy arrays to keep
         #: track of all the scores for internal use only. This is not used
         #: for writing scores to .rtdc files. The scores cache is important
@@ -100,7 +133,7 @@ class DCTagSession:
         self.scores = []
 
         if self.path_lock.exists():
-            raise SessionLockedError(
+            raise DCTagSessionLockedError(
                 f"Somebody else is currently working on {self.path} or "
                 + "DCTag exited unexpectedly in a previous run! Please ask "
                 + "Paul to implement session recovery!")
@@ -130,7 +163,7 @@ class DCTagSession:
                 self.write_scores(clear_scores=True)
                 self.write_history(clear_history=True)
             except BaseException as exc:
-                raise SessionWriteError(
+                raise DCTagSessionWriteError(
                     f"Could not write to session {self.path}!") from exc
 
     def get_score(self, feature, index):
@@ -227,10 +260,10 @@ class DCTagSession:
                 hw.store_log(
                     "dctag-history",
                     time.strftime(
-                        f"DCTag history %Y-%m-%d %H:%M:%S for '{self.user}'"))
+                        f".Update at %Y-%m-%d %H:%M:%S ({self.user})"))
                 for key in sorted(self.history.keys()):
                     hw.store_log("dctag-history",
-                                 f" {key}: {self.history[key]}")
+                                 f"..{key}: {self.history[key]}")
             if clear_history:
                 # clear history
                 self.history.clear()

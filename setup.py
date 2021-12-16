@@ -21,7 +21,7 @@ setup(
     license="None",
     description=description,
     long_description=open('README.rst').read() if exists('README.rst') else '',
-    install_requires=["dclab>=0.39.2",  # pinned for triaging
+    install_requires=["dclab>=0.39.6",  # pinned for triaging
                       "h5py>=2.8.0",
                       "numpy",
                       "pyqt5",

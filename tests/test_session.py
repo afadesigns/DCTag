@@ -22,21 +22,31 @@ def test_session_locked_error():
     lock_path = path.with_suffix(".dctag")
     lock_path.touch()
     # make sure the session cannot be opened if it is locked
-    with pytest.raises(session.SessionLockedError, match=f"{path}"):
+    with pytest.raises(session.DCTagSessionLockedError, match=f"{path}"):
         with session.DCTagSession(path, "Peter"):
             pass
     # make sure the lock file is not removed by context manager
     assert lock_path.exists()
 
 
+def test_session_user_error():
+    path = get_clean_data_path()
+    with session.DCTagSession(path, "Peter"):
+        pass
+
+    with pytest.raises(session.DCTagSessionWrongUserError, match="Peter"):
+        with session.DCTagSession(path, "Hans"):
+            pass
+
+
 def test_flush_with_missing_file_error():
     path = get_clean_data_path()
     # error should be raised on flush and on __exit__
-    with pytest.raises(session.SessionWriteError, match=f"{path}"):
+    with pytest.raises(session.DCTagSessionWriteError, match=f"{path}"):
         with session.DCTagSession(path, "Peter") as dts:
             dts.set_score("ml_score_abc", 0, True)
             path.unlink()
-            with pytest.raises(session.SessionWriteError, match=f"{path}"):
+            with pytest.raises(session.DCTagSessionWriteError, match=f"{path}"):
                 dts.flush()
 
 
@@ -160,7 +170,7 @@ def test_set_score_lists_and_history():
         assert "dctag-history" in ds.logs
         dctaglog = "\n".join(ds.logs["dctag-history"])
         assert "ml_score_abc count True: 2" in dctaglog
-        assert "for 'Peter'" in dctaglog
+        assert dctaglog.startswith("User: Peter")
 
 
 def test_set_score_multiple_ratings_for_index():
