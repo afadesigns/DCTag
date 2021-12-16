@@ -16,8 +16,10 @@ class TabSessionInfo(QtWidgets.QWidget):
     def update_session(self, session):
         """Update this widget with the session info"""
         if session is None:
+            user = ""
             logs = "No session."
         else:
+            user = session.user
             with session.score_lock:
                 try:
                     with dclab.new_dataset(session.path) as ds:
@@ -25,3 +27,5 @@ class TabSessionInfo(QtWidgets.QWidget):
                 except BaseException:
                     logs = f"Cannot get logs from '{session.path}'!"
         self.plainTextEdit_logs.setPlainText(logs)
+        self.label_username.setText(user)
+        self.label_num_sessions.setText(f"{logs.count('new session')}")
