@@ -46,7 +46,8 @@ def test_flush_with_missing_file_error():
         with session.DCTagSession(path, "Peter") as dts:
             dts.set_score("ml_score_abc", 0, True)
             path.unlink()
-            with pytest.raises(session.DCTagSessionWriteError, match=f"{path}"):
+            with pytest.raises(session.DCTagSessionWriteError,
+                               match=f"{path}"):
                 dts.flush()
 
 
