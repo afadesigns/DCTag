@@ -23,7 +23,7 @@ def test_session_locked_error():
     lock_path.touch()
     # make sure the session cannot be opened if it is locked
     with pytest.raises(session.SessionLockedError, match=f"{path}"):
-        with session.DCTagSession(path, "Peter") as dts:
+        with session.DCTagSession(path, "Peter"):
             pass
     # make sure the lock file is not removed by context manager
     assert lock_path.exists()
@@ -38,6 +38,86 @@ def test_flush_with_missing_file_error():
             path.unlink()
             with pytest.raises(session.SessionWriteError, match=f"{path}"):
                 dts.flush()
+
+
+def test_get_score_basic():
+    path = get_clean_data_path()
+    with session.DCTagSession(path, "Peter") as dts:
+        dts.set_score("ml_score_abc", 0, True)
+        dts.set_score("ml_score_abc", 2, False)
+        dts.set_score("ml_score_abc", 1, True)
+
+        assert dts.get_score("ml_score_abc", 0) is True
+        assert dts.get_score("ml_score_abc", 1) is True
+        assert dts.get_score("ml_score_abc", 2) is False
+        assert np.isnan(dts.get_score("ml_score_abc", 3))
+        assert np.isnan(dts.get_score("ml_score_ukn", 3))
+
+    # again in new session
+    with session.DCTagSession(path, "Peter") as dts:
+        assert dts.get_score("ml_score_abc", 0) is True
+        assert dts.get_score("ml_score_abc", 1) is True
+        assert dts.get_score("ml_score_abc", 2) is False
+        assert np.isnan(dts.get_score("ml_score_abc", 3))
+        assert np.isnan(dts.get_score("ml_score_ukn", 3))
+
+
+def test_get_score_linked():
+    path = get_clean_data_path()
+    with session.DCTagSession(
+            path,
+            "Peter",
+            linked_features=["ml_score_abc", "ml_score_123"]) as dts:
+        dts.set_score("ml_score_abc", 0, True)
+        dts.set_score("ml_score_abc", 2, False)
+        dts.set_score("ml_score_abc", 1, True)
+        dts.set_score("ml_score_123", 3, True)
+        dts.set_score("ml_score_000", 4, True)
+        dts.set_score("ml_score_123", 5, False)
+
+        assert dts.get_score("ml_score_abc", 0) is True
+        assert dts.get_score("ml_score_abc", 1) is True
+        assert dts.get_score("ml_score_abc", 2) is False
+        assert dts.get_score("ml_score_abc", 3) is False
+        assert np.isnan(dts.get_score("ml_score_abc", 4))
+        assert np.isnan(dts.get_score("ml_score_abc", 5))
+
+        assert dts.get_score("ml_score_123", 0) is False
+        assert dts.get_score("ml_score_123", 1) is False
+        assert np.isnan(dts.get_score("ml_score_123", 2))
+        assert dts.get_score("ml_score_123", 3) is True
+        assert np.isnan(dts.get_score("ml_score_123", 4))
+        assert dts.get_score("ml_score_123", 5) is False
+
+        assert np.isnan(dts.get_score("ml_score_000", 0))
+        assert np.isnan(dts.get_score("ml_score_000", 1))
+        assert np.isnan(dts.get_score("ml_score_000", 2))
+        assert np.isnan(dts.get_score("ml_score_000", 3))
+        assert dts.get_score("ml_score_000", 4) is True
+        assert np.isnan(dts.get_score("ml_score_000", 5))
+
+    # again in new session
+    with session.DCTagSession(path, "Peter") as dts:
+        assert dts.get_score("ml_score_abc", 0) is True
+        assert dts.get_score("ml_score_abc", 1) is True
+        assert dts.get_score("ml_score_abc", 2) is False
+        assert dts.get_score("ml_score_abc", 3) is False
+        assert np.isnan(dts.get_score("ml_score_abc", 4))
+        assert np.isnan(dts.get_score("ml_score_abc", 5))
+
+        assert dts.get_score("ml_score_123", 0) is False
+        assert dts.get_score("ml_score_123", 1) is False
+        assert np.isnan(dts.get_score("ml_score_123", 2))
+        assert dts.get_score("ml_score_123", 3) is True
+        assert np.isnan(dts.get_score("ml_score_123", 4))
+        assert dts.get_score("ml_score_123", 5) is False
+
+        assert np.isnan(dts.get_score("ml_score_000", 0))
+        assert np.isnan(dts.get_score("ml_score_000", 1))
+        assert np.isnan(dts.get_score("ml_score_000", 2))
+        assert np.isnan(dts.get_score("ml_score_000", 3))
+        assert dts.get_score("ml_score_000", 4) is True
+        assert np.isnan(dts.get_score("ml_score_000", 5))
 
 
 def test_set_score_wrong_feature_error():
