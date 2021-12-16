@@ -9,7 +9,7 @@ def main():
     imdir = pkg_resources.resource_filename("dctag", "img")
 
     from PyQt5 import QtCore, QtGui
-    from .main import DCTag
+    from .gui import DCTag
 
     # Set Application Icon
     icon_path = os.path.join(imdir, "icon.png")

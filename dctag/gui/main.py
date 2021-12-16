@@ -11,13 +11,13 @@ import numpy
 
 from PyQt5 import uic, QtCore, QtWidgets
 
-from ._version import version as __version__
+from .._version import version as __version__
 
 
 class DCTag(QtWidgets.QMainWindow):
     def __init__(self, check_update=True):
         super(DCTag, self).__init__()
-        path_ui = pkg_resources.resource_filename("dctag", "main.ui")
+        path_ui = pkg_resources.resource_filename("dctag.gui", "main.ui")
         uic.loadUi(path_ui, self)
         self.setWindowTitle("DCTag {}".format(__version__))
         # Disable native menubar (e.g. on Mac)
@@ -27,6 +27,7 @@ class DCTag(QtWidgets.QMainWindow):
         # Help menu
         self.actionSoftware.triggered.connect(self.on_action_software)
         self.actionAbout.triggered.connect(self.on_action_about)
+
         # if "--version" was specified, print the version and exit
         if "--version" in sys.argv:
             print(__version__)
