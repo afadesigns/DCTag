@@ -1,3 +1,5 @@
+0.0.3
+ - feat: ask for username and remember it in settings (#14)
 0.0.2
  - add session management submodule (#5)
  - set the initial GUI layout (#4)
