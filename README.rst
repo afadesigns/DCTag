@@ -22,27 +22,39 @@ Here is how we manage contributions:
    interfer with your issue (e.g. editing same part of a file)
 5. Clone into your fork and make sure your fork is up-to-date with the current `main` branch::
 
-      git remote add upstream https://gitlab.gwdg.de/blood_data_analysis/dctag
+      git remote add upstream git@gitlab.gwdg.de:blood_data_analysis/dctag
       git fetch upstream
       git checkout main
+      # THIS WILL PURGE ALL OF YOUR CURRENT CHANGES!
+      # DO NOT DO THIS IF YOU HAVE ALREADY STARTED WORKING ON SOMETHING!
       git reset --hard upstream/main
       git push origin main --force
 
-6. Activate your virtual environment and install dctag in editable mode
+6. Activate your virtual environment and install dctag in editable mode::
 
-    pip install -e .
+      pip install -e .
 
 7. Create a new branch that starts with your issue number and short description::
 
       git branch 15-keyboard-control
+      git checkout 15-keyboard-control
 
-8. Make your changes and commit.
+8. Make your changes and commit::
 
       git commit -a -m "feat: introduced keyboard control"
+      # for the first push
+      git push --set-upstream origin 15-keyboard-control
+      # for consecutive changes
+      git commit -a -m "fix: layout reversed"
       git push
 
-9. Go to you fork and create a merge request. Assign Paul to it.
+9. Go to you fork and you will see the text::
 
+      You pushed to 15-keyboard-control at USERNAME / DCTag 1 minute ago
+
+   Below that is a big blue merge button that will create a merge request
+   to the target ``blood_data_analysis/dctag:main``.
+   Assign Paul to the merge request.
 
 Testing
 -------
