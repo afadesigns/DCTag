@@ -27,7 +27,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QGroupBox" name="groupBox_event">
      <property name="title">
       <string>Event</string>
      </property>
