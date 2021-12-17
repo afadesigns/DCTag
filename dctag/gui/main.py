@@ -1,3 +1,4 @@
+import getpass
 import pathlib
 import pkg_resources
 import signal
@@ -16,6 +17,41 @@ from .._version import version as __version__
 class DCTag(QtWidgets.QMainWindow):
     def __init__(self, check_update=True):
         super(DCTag, self).__init__()
+
+        # Settings are stored in the .ini file format. Even though
+        # `self.settings` may return integer/bool in the same session,
+        # in the next session, it will reliably return strings. Lists
+        # of strings (comma-separated) work nicely though.
+        # Some promoted widgets need the below constants set in order
+        # to access the settings upon initialization.
+        QtCore.QCoreApplication.setOrganizationName("MPL")
+        QtCore.QCoreApplication.setOrganizationDomain("mpl.mpg.de")
+        QtCore.QCoreApplication.setApplicationName("dctag")
+        QtCore.QSettings.setDefaultFormat(QtCore.QSettings.IniFormat)
+
+        #: DCOR-Aid settings
+        self.settings = QtCore.QSettings()
+        username = self.settings.value("user/name", None)
+        if username is None:
+            username, ok = QtWidgets.QInputDialog.getText(
+                self,
+                "Specify username",
+                "Please specify your alias. This will be used to<br>"
+                + "attribute the datasets you labeled to a unique<br>"
+                + "entity and it will be used to lock/link .rtdc files<br>"
+                + "to that entity.<br><br>"
+                + "Please choose wisely.<br>"
+                + "You should not change it in the future.",
+                text=getpass.getuser()
+                )
+            if ok and username.strip():
+                username = username.strip()
+            else:
+                # Abort
+                sys.exit(0)
+        self.settings.setValue("user/name", username)
+
+        # initialize UI
         path_ui = pkg_resources.resource_filename("dctag.gui", "main.ui")
         uic.loadUi(path_ui, self)
         self.setWindowTitle("DCTag {}".format(__version__))
@@ -127,8 +163,10 @@ class DCTag(QtWidgets.QMainWindow):
         """Load an .rtdc file into the user interface"""
         if self.session_close():
             try:
+                user = self.settings.value("user/name", None)
+                assert user
                 self.session = session.DCTagSession(path=path_rtdc,
-                                                    user="unknown",
+                                                    user=user,
                                                     linked_features=[])
             except session.DCTagSessionWrongUserError as e:
                 QtWidgets.QMessageBox.warning(
