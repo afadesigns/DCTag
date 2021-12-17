@@ -28,6 +28,8 @@ Here is how we manage contributions:
       # THIS WILL PURGE ALL OF YOUR CURRENT CHANGES!
       # DO NOT DO THIS IF YOU HAVE ALREADY STARTED WORKING ON SOMETHING!
       git reset --hard upstream/main
+      # For this to work you have to go to your fork, "Settings". "Repository"
+      # "Protected branches" and deactivate "Require approval from code owners".
       git push origin main --force
 
 6. Activate your virtual environment and install dctag in editable mode::
