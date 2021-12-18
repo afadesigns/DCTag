@@ -9,9 +9,17 @@ import dclab
 import h5py
 import numpy
 from PyQt5 import uic, QtCore, QtWidgets
+import pyqtgraph as pg
 
 from .. import session
 from .._version import version as __version__
+
+
+# global plotting configuration parameters
+pg.setConfigOption("background", None)
+pg.setConfigOption("foreground", "k")
+pg.setConfigOption("antialias", True)
+pg.setConfigOption("imageAxisOrder", "row-major")
 
 
 class DCTag(QtWidgets.QMainWindow):
