@@ -61,13 +61,13 @@
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
-       <widget class="QWidget" name="scatter_deform_area_um" native="true"/>
+       <widget class="ScatterPlotWidget" name="scatter_1" native="true"/>
       </item>
       <item>
-       <widget class="QWidget" name="scatter_birght_avg_area_um" native="true"/>
+       <widget class="ScatterPlotWidget" name="scatter_2" native="true"/>
       </item>
       <item>
-       <widget class="QWidget" name="scatter_bright_avg_bright_sd" native="true"/>
+       <widget class="ScatterPlotWidget" name="scatter_3" native="true"/>
       </item>
      </layout>
     </widget>
@@ -79,6 +79,12 @@
    <class>SimpleImageView</class>
    <extends>QGraphicsView</extends>
    <header>dctag.gui.widget_img</header>
+  </customwidget>
+  <customwidget>
+   <class>ScatterPlotWidget</class>
+   <extends>QWidget</extends>
+   <header>dctag.gui.widget_scat</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

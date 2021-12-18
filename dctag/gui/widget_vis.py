@@ -33,6 +33,8 @@ class WidgetVisualize(QtWidgets.QWidget):
                     "mask": ds["mask"][index],
                     "pos_x_px": self.get_feature_data("pos_x")[index] / pxs,
                     }
+            for feat in ["area_um", "deform", "bright_avg", "bright_sd"]:
+                data[feat] = self.get_feature_data(feat)[index]
         return data
 
     def set_event(self, session, event_index):
@@ -41,6 +43,7 @@ class WidgetVisualize(QtWidgets.QWidget):
             self.get_event_data.cache_clear()
             self.get_feature_data.cache_clear()
             self.session = session
+            self.update_scatter_plots()
         if self.session is None:
             self.setEnabled(False)
             self.groupBox_event.setTitle("Event")
@@ -58,10 +61,22 @@ class WidgetVisualize(QtWidgets.QWidget):
             # cropped image
             image_cropped = get_cropped_image(data)
             self.image_cropped.setImage(image_cropped)
-            # Plot the scatter plots
-            # TODO:
-            # - scatter plots should be plotted initially
-            # - only position of current index should be changed (fast)
+            # Plot event in the scatter plots
+            for plot, featx, featy in [
+                [self.scatter_1, "area_um", "deform"],
+                [self.scatter_2, "area_um", "bright_avg"],
+                [self.scatter_3, "area_um", "bright_sd"],
+            ]:
+                plot.set_event(data[featx], data[featy])
+
+    def update_scatter_plots(self):
+        for plot, featx, featy in [
+            [self.scatter_1, "area_um", "deform"],
+            [self.scatter_2, "area_um", "bright_avg"],
+            [self.scatter_3, "area_um", "bright_sd"],
+        ]:
+            plot.set_scatter(self.get_feature_data(featx),
+                             self.get_feature_data(featy))
 
 
 def get_contour_image(event_data):
