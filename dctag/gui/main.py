@@ -67,6 +67,8 @@ class DCTag(QtWidgets.QMainWindow):
         self.menubar.setNativeMenuBar(False)
         # File menu
         self.actionOpen.triggered.connect(self.on_action_open)
+        self.actionQuit.triggered.connect(self.on_action_quit)
+        self.actionClose.triggered.connect(self.on_action_close)
         # Help menu
         self.actionSoftware.triggered.connect(self.on_action_software)
         self.actionAbout.triggered.connect(self.on_action_about)
@@ -113,6 +115,13 @@ class DCTag(QtWidgets.QMainWindow):
                                     about_text)
 
     @QtCore.pyqtSlot()
+    def on_action_close(self):
+        self.session_close()
+        # Go to session tab and update info
+        self.tabWidget.setCurrentIndex(0)
+        self.on_tab_changed()
+
+    @QtCore.pyqtSlot()
     def on_action_open(self):
         path, _ = QtWidgets.QFileDialog.getOpenFileName(
             self,
@@ -121,6 +130,11 @@ class DCTag(QtWidgets.QMainWindow):
             'RT-DC data (*.rtdc)')
         if path:
             self.session_open(path)
+
+    @QtCore.pyqtSlot()
+    def on_action_quit(self):
+        self.on_action_close()
+        QtCore.QCoreApplication.quit()
 
     @QtCore.pyqtSlot()
     def on_action_software(self):

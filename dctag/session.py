@@ -8,6 +8,7 @@ what could possibly happen next.
 import threading
 import time
 import pathlib
+import warnings
 
 import dclab
 import h5py
@@ -16,7 +17,15 @@ import numpy as np
 from ._version import version
 
 
+class DCTagSessionClosedWarning(UserWarning):
+    pass
+
+
 class DCTagSessionError(BaseException):
+    pass
+
+
+class DCTagSessionClosedError(DCTagSessionError):
     pass
 
 
@@ -139,12 +148,8 @@ class DCTagSession:
 
         # finally, acquire the file system lock
         self.path_lock.touch()
-
-    def __del__(self):
-        try:
-            self.close()
-        except BaseException:
-            pass
+        # keep track of whether we still have an open session
+        self._closed = False
 
     def __enter__(self):
         return self
@@ -152,10 +157,41 @@ class DCTagSession:
     def __exit__(self, type, value, traceback):
         self.close()
 
+    def assert_session_open(self, purpose="perform an undefined task",
+                            strict=False):
+        """Warn or raise an error if the session is closed
+
+        Parameters
+        ----------
+        purpose: str
+            Describe why you need the session open; used for debugging.
+        strict: bool
+            Whether to force raising a DCTagSessionClosedError; otherwise
+            a DCTagSessionClosedWarning may be raised in situations where
+            `self.history` or `self.scores` are empty.
+        """
+        if self._closed:
+            if self.history or self.scores or strict:
+                raise DCTagSessionClosedError(
+                    "The session has been closed, but there are still data to "
+                    + f"be written to '{self.path}'! Cannot {purpose}.",)
+            else:
+                warnings.warn(
+                    "Session has been closed, but you are trying to "
+                    + f"{purpose} which requires an open session. Luckily, "
+                    + "there is nothing that needs to be written to disk, but "
+                    + "you should try to avoid this anyway.",
+                    DCTagSessionClosedWarning)
+
     def close(self):
         """Close this session, flushing everything to `self.path`"""
         self.flush()
-        self.path_lock.unlink()
+        with self.score_lock:
+            # call this function in the score_lock context again to
+            # be on the safe side.
+            self.assert_session_open("close the session")
+            self._closed = True
+            self.path_lock.unlink(missing_ok=True)
 
     def flush(self):
         """Flush all changes made to disk
@@ -165,6 +201,7 @@ class DCTagSession:
         thread.
         """
         with self.score_lock:
+            self.assert_session_open("flush the session")
             try:
                 self.write_scores(clear_scores=True)
                 self.write_history(clear_history=True)
@@ -193,6 +230,7 @@ class DCTagSession:
         """
         # We use the score cache for that
         with self.score_lock:
+            self.assert_session_open(f"get the score {feature} at {index}")
             if feature not in self.scores_cache:
                 value = np.nan
             else:
@@ -223,6 +261,8 @@ class DCTagSession:
             raise ValueError(
                 f"Expected 'ml_score_xxx' feature, got '{feature}'!")
         with self.score_lock:
+            self.assert_session_open(f"set the score {feature} at {index}",
+                                     strict=True)
             # scores list
             self.scores.append((feature, index, value))
 

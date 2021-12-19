@@ -32,7 +32,6 @@ class TabBinaryLabel(QtWidgets.QWidget):
 
     @property
     def feature(self):
-        print(self.comboBox_score.currentData())
         return self.comboBox_score.currentData()
 
     def update_session(self, session):

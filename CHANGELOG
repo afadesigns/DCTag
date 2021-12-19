@@ -1,5 +1,7 @@
 0.0.3
+ - feat: implement binary classification story (multiple issues)
  - feat: ask for username and remember it in settings (#14)
+ - setup: require Python 3.8 or higher
 0.0.2
  - add session management submodule (#5)
  - set the initial GUI layout (#4)

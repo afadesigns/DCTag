@@ -27,7 +27,7 @@ setup(
                       "pyqt5",
                       "pyqtgraph",
                       ],
-    python_requires='>=3.7, <4',
+    python_requires='>=3.8, <4',
     entry_points={"gui_scripts": ['dctag = dctag.__main__:main']},
     keywords=["RT-DC", "deformability", "cytometry", "machine-learning"],
     classifiers=['Operating System :: OS Independent',

@@ -171,7 +171,7 @@ def test_set_score_lists_and_history():
         assert "dctag-history" in ds.logs
         dctaglog = "\n".join(ds.logs["dctag-history"])
         assert "ml_score_abc count True: 2" in dctaglog
-        assert dctaglog.startswith("User: Peter")
+        assert dctaglog.startswith("user: Peter")
 
 
 def test_set_score_multiple_ratings_for_index():
@@ -239,3 +239,54 @@ def test_set_score_with_linked_features():
         assert np.isnan(ds["ml_score_002"][4])
         assert ds["ml_score_ot1"][4] == 1
         assert np.isnan(ds["ml_score_ot2"][4])
+
+
+def test_session_error_closed_flush():
+    path = get_clean_data_path()
+    dts = session.DCTagSession(path, "Peter")
+    dts.set_score("ml_score_001", 10, False)
+    # Force this scenario which otherwise could only be triggered maybe
+    # via threading.
+    dts._closed = True
+    with pytest.raises(session.DCTagSessionClosedError,
+                       match="flush the session"):
+        dts.flush()
+
+
+def test_session_error_closed_set_score():
+    path = get_clean_data_path()
+    dts = session.DCTagSession(path, "Peter")
+    dts.close()
+    with pytest.raises(session.DCTagSessionClosedError,
+                       match="set the score"):
+        dts.set_score("ml_score_001", 0, True)
+
+
+def test_session_warning_closed_get_score():
+    path = get_clean_data_path()
+    dts = session.DCTagSession(path, "Peter")
+    dts.set_score("ml_score_123", 0, True)
+    dts.close()
+    with pytest.warns(session.DCTagSessionClosedWarning,
+                      match="get the score"):
+        assert dts.get_score("ml_score_123", 0)
+
+
+def test_session_warning_closed_close():
+    path = get_clean_data_path()
+    dts = session.DCTagSession(path, "Peter")
+    dts.set_score("ml_score_123", 0, True)
+    dts.close()
+    with pytest.warns(session.DCTagSessionClosedWarning,
+                      match="close the session"):
+        dts.close()
+
+
+def test_session_warning_closed_flush():
+    path = get_clean_data_path()
+    dts = session.DCTagSession(path, "Peter")
+    dts.set_score("ml_score_123", 0, True)
+    dts.close()
+    with pytest.warns(session.DCTagSessionClosedWarning,
+                      match="flush the session"):
+        dts.flush()

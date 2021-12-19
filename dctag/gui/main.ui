@@ -52,6 +52,7 @@
     </property>
     <addaction name="separator"/>
     <addaction name="actionOpen"/>
+    <addaction name="actionClose"/>
     <addaction name="actionQuit"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
@@ -98,6 +99,11 @@
   <action name="actionOpen">
    <property name="text">
     <string>&amp;Open .rtdc file</string>
+   </property>
+  </action>
+  <action name="actionClose">
+   <property name="text">
+    <string>&amp;Close current file</string>
    </property>
   </action>
  </widget>
