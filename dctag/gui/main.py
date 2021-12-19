@@ -90,6 +90,12 @@ class DCTag(QtWidgets.QMainWindow):
         self.activateWindow()
         self.setWindowState(QtCore.Qt.WindowState.WindowActive)
 
+    def closeEvent(self, event):
+        if self.session_close():
+            event.accept()
+        else:
+            event.ignore()
+
     def dragEnterEvent(self, e):
         """Whether files are accepted"""
         if e.mimeData().hasUrls():
@@ -168,10 +174,9 @@ class DCTag(QtWidgets.QMainWindow):
             except session.DCTagSessionWriteError as e:
                 QtWidgets.QMessageBox.warning(
                     self,
-                    "Cannot close previous session",
+                    "Cannot close this session",
                     "For some reason, it is not possible to close the current "
-                    + f"session'{self.session.path}', so I will not open a "
-                    + "new session. Details:<br><br>"
+                    + f"session '{self.session.path}'. Details:<br><br>"
                     + e.args[-1]
                 )
                 success = False
