@@ -148,11 +148,16 @@ class DCTagSession:
                 h5userstr = h5["logs"]["dctag-history"][0]
                 if isinstance(h5userstr, bytes):
                     h5userstr = h5userstr.decode("utf-8")
-                h5user = h5userstr.split(":")[1].strip()
-                if h5user != self.user:
-                    raise DCTagSessionWrongUserError(
-                        f"Expected user '{self.user}' in '{self.path}', but "
-                        + f"got '{h5user}'!")
+                if h5userstr.startswith("user:"):
+                    h5user = h5userstr.split(":")[1].strip()
+                    if h5user != self.user:
+                        raise DCTagSessionWrongUserError(
+                            f"Expected user '{self.user}' in '{self.path}', "
+                            + f"got '{h5user}'!")
+                else:
+                    # Something went wrong (maybe lost history).
+                    # Reinstate the claim!
+                    h5["logs"]["dctag-history"][0] = f"user: {self.user}"
             else:
                 with dclab.RTDCWriter(h5) as hw:
                     hw.store_log("dctag-history", f"user: {self.user}")
@@ -355,7 +360,7 @@ class DCTagSession:
         This method is NOT thread-safe. Use `self.flush` instead!
         """
         if self.scores:
-            with h5py.File(self.path, mode="a") as h5:
+            with h5py.File(self.path, mode="r+") as h5:
                 # make sure that all linked features are available
                 for feat in self.linked_features:
                     self.require_h5_score_dataset(h5, feat)

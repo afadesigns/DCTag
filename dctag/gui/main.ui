@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1112</width>
-    <height>946</height>
+    <width>1091</width>
+    <height>955</height>
    </rect>
   </property>
   <property name="acceptDrops">
@@ -42,7 +42,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1112</width>
+     <width>1091</width>
      <height>31</height>
     </rect>
    </property>
@@ -53,6 +53,7 @@
     <addaction name="separator"/>
     <addaction name="actionOpen"/>
     <addaction name="actionClose"/>
+    <addaction name="separator"/>
     <addaction name="actionQuit"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
@@ -62,28 +63,23 @@
     <addaction name="actionSoftware"/>
     <addaction name="actionAbout"/>
    </widget>
+   <widget class="QMenu" name="menuSession">
+    <property name="title">
+     <string>&amp;Session</string>
+    </property>
+    <addaction name="actionFlushSession"/>
+    <addaction name="actionCloseSession"/>
+    <addaction name="separator"/>
+    <addaction name="actionBackupSession"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuSession"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="action_add">
-   <property name="text">
-    <string>&amp;Add measurements</string>
-   </property>
-  </action>
-  <action name="action_clear">
-   <property name="text">
-    <string>&amp;Clear measurements</string>
-   </property>
-  </action>
   <action name="actionQuit">
    <property name="text">
     <string>&amp;Quit</string>
-   </property>
-  </action>
-  <action name="action_add_folder">
-   <property name="text">
-    <string>Add &amp;folder with measurements</string>
    </property>
   </action>
   <action name="actionAbout">
@@ -103,7 +99,22 @@
   </action>
   <action name="actionClose">
    <property name="text">
-    <string>&amp;Close current file</string>
+    <string>&amp;Close session</string>
+   </property>
+  </action>
+  <action name="actionCloseSession">
+   <property name="text">
+    <string>&amp;Close session</string>
+   </property>
+  </action>
+  <action name="actionFlushSession">
+   <property name="text">
+    <string>&amp;Flush session</string>
+   </property>
+  </action>
+  <action name="actionBackupSession">
+   <property name="text">
+    <string>&amp;Backup session</string>
    </property>
   </action>
  </widget>
@@ -122,5 +133,22 @@
   </customwidget>
  </customwidgets>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>actionCloseSession</sender>
+   <signal>triggered()</signal>
+   <receiver>actionClose</receiver>
+   <slot>trigger()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

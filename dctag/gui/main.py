@@ -70,6 +70,9 @@ class DCTag(QtWidgets.QMainWindow):
         self.actionOpen.triggered.connect(self.on_action_open)
         self.actionQuit.triggered.connect(self.on_action_quit)
         self.actionClose.triggered.connect(self.on_action_close)
+        # Session menu
+        self.actionFlushSession.triggered.connect(self.on_action_flush)
+        self.actionBackupSession.triggered.connect(self.on_action_backup)
         # Help menu
         self.actionSoftware.triggered.connect(self.on_action_software)
         self.actionAbout.triggered.connect(self.on_action_about)
@@ -127,11 +130,21 @@ class DCTag(QtWidgets.QMainWindow):
         QtWidgets.QMessageBox.about(self, f"DCTag {version}", about_text)
 
     @QtCore.pyqtSlot()
+    def on_action_backup(self):
+        """Create an .rtdc file with the current history and score cache"""
+        pass
+
+    @QtCore.pyqtSlot()
     def on_action_close(self):
         self.session_close()
         # Go to session tab and update info
         self.tabWidget.setCurrentIndex(0)
         self.on_tab_changed()
+
+    @QtCore.pyqtSlot()
+    def on_action_flush(self):
+        if self.session:
+            self.session.flush()
 
     @QtCore.pyqtSlot()
     def on_action_open(self):
@@ -147,8 +160,8 @@ class DCTag(QtWidgets.QMainWindow):
 
     @QtCore.pyqtSlot()
     def on_action_quit(self):
-        self.on_action_close()
-        QtCore.QCoreApplication.quit()
+        if self.session_close():
+            QtCore.QCoreApplication.quit()
 
     @QtCore.pyqtSlot()
     def on_action_software(self):
