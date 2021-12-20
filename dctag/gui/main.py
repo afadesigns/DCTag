@@ -132,7 +132,39 @@ class DCTag(QtWidgets.QMainWindow):
     @QtCore.pyqtSlot()
     def on_action_backup(self):
         """Create an .rtdc file with the current history and score cache"""
-        pass
+        reply = QtWidgets.QMessageBox.question(
+            self,
+            "Do you know what you are doing?",
+            "You are about to export your ML scores to an HDF5 file. "
+            + "Normally, you do not need to do this. You may want to, if you "
+            + "are not able to flush the current session (e.g. because you "
+            + "have your .rtdc file on a network share and there is no "
+            + "connectivity). Proceed?"
+        )
+        if reply == QtWidgets.QMessageBox.Yes:
+            # First attempt to flush the session again.
+            try:
+                self.session.flush()
+            except BaseException:
+                pass  # never mind
+            # Open a dialog for the user to save the scores as an .hdf5 file
+            po, _ = QtWidgets.QFileDialog.getSaveFileName(
+                self, 'Path to new ML score file', '', 'HDF5 file (*.h5)')
+            if po:
+                po = pathlib.Path(po)
+                # make sure the suffix is .h5
+                if po.suffix != ".h5":
+                    po = po.with_name(po.name + ".h5")
+                self.session.backup_scores(po)
+            # Ask the user whether to close DCTag now
+            reply2 = QtWidgets.QMessageBox.question(
+                self,
+                "Close DCTag now?",
+                "You have saved your scores and somebody with sufficient "
+                + "experience will be able to append them to the original "
+                + "file (if that still exists). Close DCTag now?")
+            if reply2 == QtWidgets.QMessageBox.Yes:
+                QtCore.QCoreApplication.quit()
 
     @QtCore.pyqtSlot()
     def on_action_close(self):

@@ -1,11 +1,14 @@
-0.0.4
+0.1.0
  - feat: implement keyboard shortcuts (#15)
  - feat: automatically flush session in background every 60s (#12)
  - feat: remember data location (#20)
  - feat: ask user before claiming a file (#11)
+ - feat: allow to back-up scores if original file is lost (#19)
  - fix: don't clutter the logs
  - fix: properly handle situations where the session file goes away
    for external reasons (e.g. deletion)
+ - setup: pin pyqtgraph to 0.12.3
+ - setup: require h5py>=3
 0.0.3
  - feat: implement binary classification story (multiple issues)
  - feat: ask for username and remember it in settings (#14)

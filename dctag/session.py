@@ -145,19 +145,24 @@ class DCTagSession:
         """Attribute this file to self.user"""
         with h5py.File(self.path, "a") as h5:
             if "dctag-history" in h5.require_group("logs"):
-                h5userstr = h5["logs"]["dctag-history"][0]
-                if isinstance(h5userstr, bytes):
-                    h5userstr = h5userstr.decode("utf-8")
-                if h5userstr.startswith("user:"):
-                    h5user = h5userstr.split(":")[1].strip()
-                    if h5user != self.user:
-                        raise DCTagSessionWrongUserError(
-                            f"Expected user '{self.user}' in '{self.path}', "
-                            + f"got '{h5user}'!")
+                if len(h5["logs"]["dctag-history"]) == 0:
+                    # We have an empty log, replace it.
+                    hw = dclab.RTDCWriter(h5, mode="replace")
+                    hw.store_log("dctag-history", f"user: {self.user}")
                 else:
-                    # Something went wrong (maybe lost history).
-                    # Reinstate the claim!
-                    h5["logs"]["dctag-history"][0] = f"user: {self.user}"
+                    h5userstr = h5["logs"]["dctag-history"][0]
+                    if isinstance(h5userstr, bytes):
+                        h5userstr = h5userstr.decode("utf-8")
+                    if h5userstr.startswith("user:"):
+                        h5user = h5userstr.split(":")[1].strip()
+                        if h5user != self.user:
+                            raise DCTagSessionWrongUserError(
+                                f"Expected user '{self.user}' in "
+                                + f"'{self.path}', got '{h5user}'!")
+                    else:
+                        # Something went wrong (maybe lost history).
+                        # Reinstate the claim!
+                        h5["logs"]["dctag-history"][0] = f"user: {self.user}"
             else:
                 with dclab.RTDCWriter(h5) as hw:
                     hw.store_log("dctag-history", f"user: {self.user}")
@@ -210,6 +215,18 @@ class DCTagSession:
                     + "there is nothing that needs to be written to disk, but "
                     + "you should try to avoid this anyway.",
                     DCTagSessionClosedWarning)
+
+    def backup_scores(self, path):
+        """Backup current scores in an HDF5 file
+
+        This can be used as a last resort to save score data if
+        the original `self.path` has gone away for some reason.
+        """
+        with h5py.File(path, mode="w") as h5:
+            with self.score_lock:
+                for feat in self.scores_cache:
+                    h5[feat] = self.scores_cache[feat]
+                h5.attrs["path_original"] = str(self.path)
 
     def close(self):
         """Close this session, flushing everything to `self.path`"""

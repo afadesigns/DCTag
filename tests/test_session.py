@@ -1,6 +1,7 @@
 import pytest
 
 import dclab
+import h5py
 import numpy as np
 
 from dctag import session
@@ -286,12 +287,102 @@ def test_set_score_wrong_feature_error():
             dts.set_score("ml_flore_abc", 0, True)
 
 
+def test_session_backup_scores():
+    path = get_clean_data_path()
+    linked = ["ml_score_001", "ml_score_002"]
+    # We cannot use the context manager, because closing it will raise
+    # an exception.
+    dts = session.DCTagSession(path, "Peter", linked_features=linked)
+    dts.set_score("ml_score_001", 0, True)
+    dts.set_score("ml_score_ot1", 0, False)
+
+    dts.set_score("ml_score_ot1", 1, True)
+    dts.set_score("ml_score_ot2", 1, False)
+    dts.set_score("ml_score_002", 1, True)
+
+    dts.set_score("ml_score_001", 2, True)
+    dts.set_score("ml_score_002", 2, False)
+
+    dts.set_score("ml_score_002", 3, True)
+    dts.set_score("ml_score_001", 3, True)
+
+    dts.set_score("ml_score_ot1", 4, True)
+    dts.set_score("ml_score_001", 4, False)
+
+    # simulate worst-case scenario
+    path.unlink()
+    assert not path.exists()
+
+    # now create a backup
+    backup_path = path.with_name("scores.h5")
+    dts.backup_scores(backup_path)
+
+    # now recreate the session by using the same path
+    path2 = get_clean_data_path()
+    with h5py.File(backup_path) as h5, dclab.RTDCWriter(path2) as hw:
+        for feat in h5:
+            hw.store_feature(feat, h5[feat])
+
+    # This is the same test as above, only this time from the recreated file
+    with dclab.new_dataset(path2) as ds:
+        assert ds["ml_score_001"][0] == 1
+        assert ds["ml_score_002"][0] == 0
+        assert ds["ml_score_ot1"][0] == 0
+        assert np.isnan(ds["ml_score_ot2"][0])
+
+        assert ds["ml_score_001"][1] == 0
+        assert ds["ml_score_002"][1] == 1
+        assert ds["ml_score_ot1"][1] == 1
+        assert ds["ml_score_ot2"][1] == 0
+
+        assert ds["ml_score_001"][2] == 1
+        assert ds["ml_score_002"][2] == 0
+        assert np.isnan(ds["ml_score_ot1"][2])
+        assert np.isnan(ds["ml_score_ot2"][2])
+
+        assert ds["ml_score_001"][3] == 1
+        assert ds["ml_score_002"][3] == 0
+        assert np.isnan(ds["ml_score_ot1"][3])
+        assert np.isnan(ds["ml_score_ot2"][3])
+
+        assert ds["ml_score_001"][4] == 0
+        assert np.isnan(ds["ml_score_002"][4])
+        assert ds["ml_score_ot1"][4] == 1
+        assert np.isnan(ds["ml_score_ot2"][4])
+
+
 def test_session_bool():
     path = get_clean_data_path()
     dts = session.DCTagSession(path, "Peter")
     assert dts
     dts.close()
     assert not dts
+
+
+def test_session_claim_path_missing_history():
+    """Handle missing history properly"""
+    path = get_clean_data_path()
+    with dclab.RTDCWriter(path) as hw:
+        hw.store_log("dctag-history", "Nothing")
+
+    with session.DCTagSession(path, "Peter"):
+        pass
+
+    with dclab.new_dataset(path) as ds:
+        assert ds.logs["dctag-history"][0] == "user: Peter"
+
+
+def test_session_claim_path_missing_history_empty_log():
+    """Handle missing history properly"""
+    path = get_clean_data_path()
+    with dclab.RTDCWriter(path) as hw:
+        hw.store_log("dctag-history", [])
+
+    with session.DCTagSession(path, "Peter"):
+        pass
+
+    with dclab.new_dataset(path) as ds:
+        assert ds.logs["dctag-history"][0] == "user: Peter"
 
 
 def test_session_error_closed_flush():
