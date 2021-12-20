@@ -215,24 +215,41 @@ class DCTag(QtWidgets.QMainWindow):
     def session_open(self, path_rtdc):
         """Load an .rtdc file into the user interface"""
         if self.session_close():
-            try:
-                user = self.settings.value("user/name", None)
-                assert user
-                self.session = session.DCTagSession(path=path_rtdc,
-                                                    user=user,
-                                                    linked_features=[])
-            except session.DCTagSessionWrongUserError as e:
-                QtWidgets.QMessageBox.warning(
-                    self,
-                    "Cannot load session",
-                    "You are trying to open a session from another user. This "
-                    + "is not supported yet. These are the details:<br><br>"
-                    + e.args[-1]
-                )
+            user = self.settings.value("user/name", None)
+            assert user
+            # check whether we have a dctag-history log and if not,
+            # ask the user whether to create a copy of the file.
+            if session.is_dctag_session(path_rtdc):
+                cont = True
             else:
-                # Go to session tab and update info
-                self.tabWidget.setCurrentIndex(0)
-                self.on_tab_changed()
+                reply = QtWidgets.QMessageBox.question(
+                    self,
+                    "Claim this file?",
+                    f"The file '{path_rtdc}' is not (yet) a DCTag session. "
+                    + "Would you like to claim this file? If you select "
+                    + "'Yes', this file will be tied to your username/alias. "
+                    + "This cannot be undone. You may alternatively select "
+                    + "'No' and open a copy of that file instead."
+                )
+                cont = reply == QtWidgets.QMessageBox.Yes
+            if cont:
+                try:
+                    self.session = session.DCTagSession(path=path_rtdc,
+                                                        user=user,
+                                                        linked_features=[])
+                except session.DCTagSessionWrongUserError as e:
+                    QtWidgets.QMessageBox.warning(
+                        self,
+                        "Cannot load session",
+                        "You are trying to open a session from another user. "
+                        + "This is not supported yet. These are the details: "
+                        + "<br><br>"
+                        + e.args[-1]
+                    )
+                else:
+                    # Go to session tab and update info
+                    self.tabWidget.setCurrentIndex(0)
+                    self.on_tab_changed()
 
     def set_title(self, task=None):
         if task is None:

@@ -17,6 +17,14 @@ def test_basic():
     assert not lock_path.exists()
 
 
+def test_is_dctag_session():
+    path = get_clean_data_path()
+    assert not session.is_dctag_session(path)
+    with session.DCTagSession(path, "Peter"):
+        pass
+    assert session.is_dctag_session(path)
+
+
 def test_session_locked_error():
     path = get_clean_data_path()
     lock_path = path.with_suffix(".dctag")
@@ -134,7 +142,7 @@ def test_get_score_linked():
 def test_log_user():
     """At the beginning, onle the user should be written"""
     path = get_clean_data_path()
-    with session.DCTagSession(path, "Peter") as dts:
+    with session.DCTagSession(path, "Peter"):
         pass
     with dclab.new_dataset(path) as ds:
         assert "".join(ds.logs["dctag-history"]).strip() == "user: Peter"
@@ -298,6 +306,14 @@ def test_set_score_with_linked_features():
         assert np.isnan(ds["ml_score_002"][4])
         assert ds["ml_score_ot1"][4] == 1
         assert np.isnan(ds["ml_score_ot2"][4])
+
+
+def test_session_bool():
+    path = get_clean_data_path()
+    dts = session.DCTagSession(path, "Peter")
+    assert dts
+    dts.close()
+    assert not dts
 
 
 def test_session_multiple_with_linked_features():

@@ -402,3 +402,9 @@ class DCTagSession:
                 if feat != feature:
                     ln_sc_ds = linked_feature_dict[feat]
                     ln_sc_ds[index] = False
+
+
+def is_dctag_session(path):
+    """Return True if `path` has a dctag-history log"""
+    with h5py.File(path, "r") as h5:
+        return "logs/dctag-history" in h5
