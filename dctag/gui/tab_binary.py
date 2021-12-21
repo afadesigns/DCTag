@@ -31,6 +31,8 @@ class TabBinaryLabel(QtWidgets.QWidget):
         self.pushButton_prev.clicked.connect(self.on_event_button)
         self.pushButton_yes.clicked.connect(self.on_event_button)
         self.pushButton_no.clicked.connect(self.on_event_button)
+        self.pushButton_fast_next.clicked.connect(self.on_event_button)
+        self.pushButton_fast_prev.clicked.connect(self.on_event_button)
 
         # keyboard shortcuts
         self.shortcuts = []
@@ -39,11 +41,16 @@ class TabBinaryLabel(QtWidgets.QWidget):
             [self.pushButton_no, ["Down", "F", "N"]],
             [self.pushButton_next, ["Right"]],
             [self.pushButton_prev, ["Left"]],
+            [self.pushButton_fast_prev, ["Shift+Left"]],
+            [self.pushButton_fast_next, ["Shift+Right"]],
         ]:
             for seq in shortcuts:
                 sc = QShortcut(QKeySequence(seq), self)
                 sc.activated.connect(button.click)
-                button.setToolTip(f"Shortcuts: {', '.join(shortcuts)}")
+                # include original ToolTip
+                tt = button.toolTip()
+                tt = tt + "; " if tt else ""
+                button.setToolTip(f"{tt}Shortcuts: {', '.join(shortcuts)}")
                 self.shortcuts.append(sc)  # keep a reference
 
     @property
@@ -111,8 +118,8 @@ class TabBinaryLabel(QtWidgets.QWidget):
         # update progress bar
         if self.feature:
             fscores = self.session.scores_cache.get(self.feature, [])
-            num_rated = np.floor(np.sum(~np.isnan(fscores)))
-            perc = int(num_rated / self.session.event_count) * 100
+            num_rated = np.sum(~np.isnan(fscores))
+            perc = int(np.floor(num_rated / self.session.event_count * 100))
             self.progressBar.setValue(perc)
 
         # visualization
@@ -148,6 +155,22 @@ class TabBinaryLabel(QtWidgets.QWidget):
         elif btn is self.pushButton_yes:
             self.session.set_score(self.feature, self.event_index, True)
             self.goto_event(self.event_index + 1)
+        elif btn is self.pushButton_fast_prev:
+            for ii in range(1, self.event_index):
+                new_index = self.event_index - ii
+                if np.isnan(self.session.get_score(self.feature, new_index)):
+                    break
+            else:
+                new_index = 0
+            self.goto_event(new_index)
+        elif btn is self.pushButton_fast_next:
+            start = min(self.event_index + 1, self.session.event_count - 1)
+            for new_index in range(start, self.session.event_count):
+                if np.isnan(self.session.get_score(self.feature, new_index)):
+                    break
+            else:
+                new_index = self.session.event_count - 1
+            self.goto_event(new_index)
 
     @QtCore.pyqtSlot()
     def on_start(self):

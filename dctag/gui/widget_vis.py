@@ -66,7 +66,7 @@ class WidgetVisualize(QtWidgets.QWidget):
         else:
             self.setEnabled(True)
             self.groupBox_event.setTitle(
-                f"Event {event_index} (total {session.event_count})")
+                f"Event {event_index} (total {session.event_count}) ")
             self.session = session
             data = self.get_event_data(event_index)
             # Plot the channel images
