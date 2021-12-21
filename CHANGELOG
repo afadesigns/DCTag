@@ -1,5 +1,6 @@
 0.2.0
  - feat: add fast-forward and fast-backward button in binary tab (#23)
+ - fix: progress bar only showed 1% and 100%
 0.1.0
  - feat: implement keyboard shortcuts (#15)
  - feat: automatically flush session in background every 60s (#12)

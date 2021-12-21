@@ -118,8 +118,8 @@ class TabBinaryLabel(QtWidgets.QWidget):
         # update progress bar
         if self.feature:
             fscores = self.session.scores_cache.get(self.feature, [])
-            num_rated = np.floor(np.sum(~np.isnan(fscores)))
-            perc = int(num_rated / self.session.event_count) * 100
+            num_rated = np.sum(~np.isnan(fscores))
+            perc = int(np.floor(num_rated / self.session.event_count * 100))
             self.progressBar.setValue(perc)
 
         # visualization
