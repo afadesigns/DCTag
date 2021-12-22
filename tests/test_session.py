@@ -428,6 +428,37 @@ def test_session_error_wronguser():
             pass
 
 
+def test_session_get_scores_true_basic():
+    path = get_clean_data_path()
+    with session.DCTagSession(path, "Peter") as dts:
+        dts.set_score("ml_score_abc", 0, True)
+        dts.set_score("ml_score_abc", 2, True)
+        dts.set_score("ml_score_abc", 3, True)
+        dts.set_score("ml_score_456", 3, True)
+
+        assert dts.get_scores_true(0) == ["ml_score_abc"]
+        assert dts.get_scores_true(1) == []
+        assert dts.get_scores_true(2) == ["ml_score_abc"]
+        assert dts.get_scores_true(3) == ["ml_score_456", "ml_score_abc"]
+        assert dts.get_scores_true(4) == []
+
+
+def test_session_get_scores_true_linked():
+    path = get_clean_data_path()
+    with session.DCTagSession(path, "Peter") as dts:
+        dts.set_score("ml_score_abc", 0, True)
+        dts.set_score("ml_score_abc", 1, True)
+        dts.set_score("ml_score_abc", 0, False)
+        dts.linked_features = ["ml_score_abc", "ml_score_456"]
+        dts.set_score("ml_score_abc", 2, True)
+        dts.set_score("ml_score_456", 3, True)
+
+        assert dts.get_scores_true(0) == []
+        assert dts.get_scores_true(1) == ["ml_score_abc"]
+        assert dts.get_scores_true(2) == ["ml_score_abc"]
+        assert dts.get_scores_true(3) == ["ml_score_456"]
+
+
 def test_session_multiple_with_linked_features():
     path = get_clean_data_path()
     with session.DCTagSession(path, "Peter") as dts:

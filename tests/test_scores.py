@@ -21,6 +21,15 @@ def test_get_feature_label(feat, label):
     assert scores.get_feature_label(feat) == label
 
 
+@pytest.mark.parametrize("feat,shortcut", [
+    ["ml_score_r1f", "R"],
+    ["ml_score_r1u", "Ctrl+R"],
+    ["ml_score_66a", "A"],  # default
+])
+def test_get_feature_shortcut(feat, shortcut):
+    assert scores.get_feature_shortcut(feat) == shortcut
+
+
 def test_unique_score_labels():
     blood = scores.get_dctag_score_dict(name="blood")
     labels = [blood[ft]["label"] for ft in blood]

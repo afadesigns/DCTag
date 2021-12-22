@@ -301,7 +301,7 @@ class DCTagSession:
         for feature in self.scores_cache:
             if self.get_score(feature, index) is True:
                 true_features.append(feature)
-        return true_features
+        return sorted(true_features)
 
     def set_score(self, feature, index, value):
         """Set the feature score of an event in the current dataset
