@@ -1,3 +1,6 @@
+0.3.0
+ - feat: implement multi-class labeling (#24)
+ - fix: always go to first event when staring to label
 0.2.0
  - feat: add fast-forward and fast-backward button in binary tab (#23)
  - fix: progress bar only showed 1% and 100%

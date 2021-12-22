@@ -175,4 +175,6 @@ class TabBinaryLabel(QtWidgets.QWidget):
 
     @QtCore.pyqtSlot()
     def on_start(self):
+        self.session.linked_features = []
         self.lock_in()
+        self.goto_event(0)

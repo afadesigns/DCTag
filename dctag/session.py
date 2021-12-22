@@ -216,6 +216,34 @@ class DCTagSession:
                     + "you should try to avoid this anyway.",
                     DCTagSessionClosedWarning)
 
+    def autocomplete_linked_features(self):
+        """Autocomplete False for linked features"""
+        with self.score_lock:
+            # Create a concatenated array with all current scores
+            fscores = np.zeros((self.event_count, len(self.linked_features)),
+                               dtype=float)
+            for ii, feat in enumerate(self.linked_features):
+                fscores[:, ii] = self.require_dict_score_dataset(
+                    self.scores_cache, feat)
+            # Sanity check
+            if np.any(np.nansum(fscores, axis=1) > 1):
+                raise ValueError(
+                    f"Some of the scores {self.linked_features} in "
+                    + f"{self.path} have ambiguous labels! Make sure that "
+                    + "always only one of those scores is labeled as True/Yes."
+                    )
+            # We are safe
+            for ii, feat in enumerate(self.linked_features):
+                mask_true = self.scores_cache[feat] == 1
+                for other_feat in self.linked_features:
+                    if other_feat != feat:
+                        mask_nan = np.isnan(self.scores_cache[other_feat])
+                        idx_new = np.where(
+                            np.logical_and(mask_true, mask_nan))[0]
+                        for idx in idx_new:
+                            self.scores.append((other_feat, idx, False))
+                            self.scores_cache[other_feat][idx] = False
+
     def backup_scores(self, path):
         """Backup current scores in an HDF5 file
 

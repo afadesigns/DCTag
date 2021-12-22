@@ -277,4 +277,6 @@ class TabMultiClassLabel(QtWidgets.QWidget):
                 )
         else:
             self.session.linked_features = self.features
+            self.session.autocomplete_linked_features()
             self.lock_in()
+            self.goto_event(0)
