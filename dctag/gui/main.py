@@ -179,12 +179,13 @@ class DCTag(QtWidgets.QMainWindow):
             self.session.flush()
 
     @QtCore.pyqtSlot()
-    def on_action_open(self):
-        path, _ = QtWidgets.QFileDialog.getOpenFileName(
-            self,
-            'Select RT-DC data',
-            self.settings.value("paths/open", ""),
-            'RT-DC data (*.rtdc)')
+    def on_action_open(self, path=None):
+        if path is None:
+            path, _ = QtWidgets.QFileDialog.getOpenFileName(
+                self,
+                'Select RT-DC data',
+                self.settings.value("paths/open", ""),
+                'RT-DC data (*.rtdc)')
         if path:
             self.settings.setValue(
                 "paths/open", str(pathlib.Path(path).parent))
