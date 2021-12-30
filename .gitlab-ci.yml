@@ -30,6 +30,8 @@ before_script:
   - source venv/bin/activate
 
 test:
+  variables:
+    QT_QPA_PLATFORM: "offscreen"
   script:
     - apt update
     - apt install -y libgl1-mesa-glx libsm6 libxext6
