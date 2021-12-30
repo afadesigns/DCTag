@@ -2,6 +2,7 @@
  - fix: minor labeling fix for previous/next in multiple tab
  - fix: properly clear visualization after session is closed
  - fix: start enumerating events at 1 instead of 0 in widget_vis
+ - tests: increased coverage to >90%
 0.3.0
  - feat: implement multi-class labeling (#24)
  - fix: always go to first event when staring to label

@@ -2,6 +2,8 @@ import io
 import pathlib
 from unittest import mock
 
+import h5py
+import numpy as np
 import pytest
 from PyQt5 import QtCore, QtWidgets
 
@@ -28,6 +30,46 @@ def run_around_tests():
     QtCore.QSettings.setDefaultFormat(QtCore.QSettings.IniFormat)
     settings = QtCore.QSettings()
     settings.setValue("user/name", "dctag-tester")
+
+
+@pytest.mark.parametrize("with_delete", [True, False])
+def test_action_backup(with_delete, qtbot):
+    # setup a nice session
+    path = get_clean_data_path()
+    mw = DCTag()
+    QtWidgets.QApplication.setActiveWindow(mw)
+    # claim session
+    with session.DCTagSession(path, "dctag-tester"):
+        pass
+    mw.on_action_open(path)
+    # go through the tabs
+    mw.tabWidget.setCurrentIndex(1)
+    qtbot.mouseClick(mw.tab_binary.pushButton_start, QtCore.Qt.LeftButton)
+    qtbot.mouseClick(mw.tab_binary.pushButton_yes, QtCore.Qt.LeftButton)
+    qtbot.mouseClick(mw.tab_binary.pushButton_no, QtCore.Qt.LeftButton)
+    qtbot.mouseClick(mw.tab_binary.pushButton_yes, QtCore.Qt.LeftButton)
+
+    if with_delete:
+        path.unlink()
+
+    export_path = path.with_name("export")
+
+    # perform the export
+    with mock.patch.object(QtWidgets.QMessageBox, "question",
+                           return_value=QtWidgets.QMessageBox.Yes):
+        with mock.patch.object(QtWidgets.QFileDialog, "getSaveFileName",
+                               return_value=(str(export_path), None)):
+            with mock.patch.object(QtCore.QCoreApplication, "quit"):
+                mw.on_action_backup()
+
+    export_path = export_path.with_suffix(".h5")
+
+    assert export_path.exists()
+    with h5py.File(export_path, "r") as h5:
+        assert h5["ml_score_r1f"][0] == 1
+        assert h5["ml_score_r1f"][1] == 0
+        assert h5["ml_score_r1f"][2] == 1
+        assert np.isnan(h5["ml_score_r1f"][3])
 
 
 def test_basic(qtbot):
