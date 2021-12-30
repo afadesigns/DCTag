@@ -145,7 +145,7 @@ class TabMultiClassLabel(QtWidgets.QWidget):
     @property
     def features(self):
         datas = self.comboBox_score.itemsCheckedData()
-        return sorted(datas)
+        return datas
 
     def update_session(self, session):
         """Update this widget with the session info"""
@@ -180,7 +180,7 @@ class TabMultiClassLabel(QtWidgets.QWidget):
         if index != 0 and self.features:
             candidates = self.session.get_scores_true(index - 1)
             scs = [f for f in candidates if f in self.session.linked_features]
-            label = " ".join([s[-3:] for s in scs]).upper()
+            label = " ".join([s[-3:] for s in scs]).upper() or "nan"
             self.label_score_prev.setText(label)
         else:
             self.label_score_prev.setText("")
@@ -188,7 +188,7 @@ class TabMultiClassLabel(QtWidgets.QWidget):
         if index != self.session.event_count - 1 and self.features:
             candidates = self.session.get_scores_true(index + 1)
             scs = [f for f in candidates if f in self.session.linked_features]
-            label = " ".join([s[-3:] for s in scs]).upper()
+            label = " ".join([s[-3:] for s in scs]).upper() or "nan"
             self.label_score_next.setText(label)
         else:
             self.label_score_next.setText("")
