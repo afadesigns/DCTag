@@ -1,6 +1,7 @@
 import pathlib
 
 from PyQt5 import QtCore, QtWidgets
+import pytest
 
 from dctag.gui.main import DCTag
 from dctag import session
@@ -14,6 +15,135 @@ def test_basic(qtbot):
     """Run the program and exit"""
     mw = DCTag()
     mw.close()
+
+
+def test_empty_session(qtbot):
+    mw = DCTag()
+    QtWidgets.QApplication.setActiveWindow(mw)
+    # select binary tab
+    mw.tabWidget.setCurrentIndex(1)
+    # make sure things are disabled
+    assert not mw.tab_binary.isEnabled()
+
+
+@pytest.mark.parametrize("event_index,expected", [
+    [-10, 0],
+    [-1, 0],
+    [0, 0],
+    [16, 16],
+    [17, 17],
+    [18, 17],
+    [5000, 17]])
+def test_goto_event_limits(event_index, expected, qtbot):
+    path = get_clean_data_path()
+    mw = DCTag()
+    QtWidgets.QApplication.setActiveWindow(mw)
+    # claim session
+    with session.DCTagSession(path, "dctag-tester"):
+        pass
+    # open session
+    mw.on_action_open(path)
+    # select binary tab
+    mw.tabWidget.setCurrentIndex(1)
+    # start labeling
+    qtbot.mouseClick(mw.tab_binary.pushButton_start, QtCore.Qt.LeftButton)
+
+    # go to event
+    mw.tab_binary.goto_event(event_index)
+    assert mw.tab_binary.event_index == expected
+
+
+def test_goto_event_button_labels(qtbot):
+    path = get_clean_data_path()
+    with session.DCTagSession(path, "dctag-tester") as dts:
+        dts.set_score("ml_score_r1f", 0, True)
+        dts.set_score("ml_score_r1f", 1, False)
+        dts.set_score("ml_score_r1f", 2, True)
+        dts.set_score("ml_score_r1f", 3, False)
+
+    mw = DCTag()
+    QtWidgets.QApplication.setActiveWindow(mw)
+    mw.on_action_open(path)
+    # select binary tab
+    mw.tabWidget.setCurrentIndex(1)
+    idx = mw.tab_binary.comboBox_score.findData("ml_score_r1f")
+    mw.tab_binary.comboBox_score.setCurrentIndex(idx)
+
+    qtbot.mouseClick(mw.tab_binary.pushButton_start, QtCore.Qt.LeftButton)
+
+    # The first event should be displayed, and it should be set to True
+    assert mw.tab_binary.pushButton_yes.text() == "[Yes]"
+    assert mw.tab_binary.pushButton_no.text() == "No"
+    assert mw.tab_binary.label_score_prev.text() == ""
+    assert mw.tab_binary.label_score_next.text() == "No"
+
+    # click on next.
+    qtbot.mouseClick(mw.tab_binary.pushButton_next, QtCore.Qt.LeftButton)
+
+    # This should be False now
+    assert mw.tab_binary.pushButton_yes.text() == "Yes"
+    assert mw.tab_binary.pushButton_no.text() == "[No]"
+    assert mw.tab_binary.label_score_prev.text() == "Yes"
+    assert mw.tab_binary.label_score_next.text() == "Yes"
+
+
+def test_event_push_buttons(qtbot):
+    path = get_clean_data_path()
+    with session.DCTagSession(path, "dctag-tester") as dts:
+        dts.set_score("ml_score_r1f", 0, True)
+        dts.set_score("ml_score_r1f", 1, False)
+        dts.set_score("ml_score_r1f", 2, True)
+        dts.set_score("ml_score_r1f", 3, False)
+
+    mw = DCTag()
+    QtWidgets.QApplication.setActiveWindow(mw)
+    mw.on_action_open(path)
+    # select binary tab
+    mw.tabWidget.setCurrentIndex(1)
+    idx = mw.tab_binary.comboBox_score.findData("ml_score_r1f")
+    mw.tab_binary.comboBox_score.setCurrentIndex(idx)
+
+    qtbot.mouseClick(mw.tab_binary.pushButton_start, QtCore.Qt.LeftButton)
+    assert mw.tab_binary.event_index == 0
+    qtbot.mouseClick(mw.tab_binary.pushButton_next, QtCore.Qt.LeftButton)
+    assert mw.tab_binary.event_index == 1
+    qtbot.mouseClick(mw.tab_binary.pushButton_fast_next, QtCore.Qt.LeftButton)
+    assert mw.tab_binary.event_index == 4
+    qtbot.mouseClick(mw.tab_binary.pushButton_prev, QtCore.Qt.LeftButton)
+    assert mw.tab_binary.event_index == 3
+    qtbot.mouseClick(mw.tab_binary.pushButton_fast_prev, QtCore.Qt.LeftButton)
+    assert mw.tab_binary.event_index == 0
+
+    # now label a little
+    qtbot.mouseClick(mw.tab_binary.pushButton_fast_next, QtCore.Qt.LeftButton)
+    assert mw.tab_binary.event_index == 4
+    qtbot.mouseClick(mw.tab_binary.pushButton_yes, QtCore.Qt.LeftButton)
+    assert mw.tab_binary.event_index == 5
+    assert mw.tab_binary.label_score_prev.text() == "Yes"
+    qtbot.mouseClick(mw.tab_binary.pushButton_no, QtCore.Qt.LeftButton)
+    assert mw.tab_binary.event_index == 6
+    assert mw.tab_binary.label_score_prev.text() == "No"
+
+    # go forward, label and then test fast_prev
+    qtbot.mouseClick(mw.tab_binary.pushButton_next, QtCore.Qt.LeftButton)
+    qtbot.mouseClick(mw.tab_binary.pushButton_next, QtCore.Qt.LeftButton)
+    assert mw.tab_binary.event_index == 8
+    qtbot.mouseClick(mw.tab_binary.pushButton_no, QtCore.Qt.LeftButton)
+    qtbot.mouseClick(mw.tab_binary.pushButton_no, QtCore.Qt.LeftButton)
+    assert mw.tab_binary.event_index == 10
+    qtbot.mouseClick(mw.tab_binary.pushButton_fast_prev, QtCore.Qt.LeftButton)
+    assert mw.tab_binary.event_index == 7
+
+    # go to the end and then test fast_next
+    mw.tab_binary.goto_event(16)
+    assert mw.tab_binary.event_index == 16
+    qtbot.mouseClick(mw.tab_binary.pushButton_no, QtCore.Qt.LeftButton)
+    qtbot.mouseClick(mw.tab_binary.pushButton_no, QtCore.Qt.LeftButton)
+    qtbot.mouseClick(mw.tab_binary.pushButton_prev, QtCore.Qt.LeftButton)
+    qtbot.mouseClick(mw.tab_binary.pushButton_prev, QtCore.Qt.LeftButton)
+    assert mw.tab_binary.event_index == 15
+    qtbot.mouseClick(mw.tab_binary.pushButton_fast_next, QtCore.Qt.LeftButton)
+    assert mw.tab_binary.event_index == 17
 
 
 def test_session_load(qtbot):
