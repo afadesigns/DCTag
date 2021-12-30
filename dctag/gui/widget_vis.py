@@ -36,6 +36,21 @@ class WidgetVisualize(QtWidgets.QWidget):
 
         self.session = None
 
+    def reset(self, reset_plots=False):
+        """Clear current visualization"""
+        # clear the event image cache
+        self.get_event_data.cache_clear()
+        self.get_feature_data.cache_clear()
+        # UI
+        self.setEnabled(False)
+        self.groupBox_event.setTitle("Event")
+        if reset_plots:
+            self.image_channel.clear()
+            self.image_channel_contour.clear()
+            self.image_cropped.clear()
+            for plot in [self.scatter_1, self.scatter_2, self.scatter_3]:
+                plot.clear()
+
     @functools.lru_cache(maxsize=900)
     def get_feature_data(self, feature):
         with dclab.new_dataset(self.session.path) as ds:
@@ -56,15 +71,12 @@ class WidgetVisualize(QtWidgets.QWidget):
 
     def set_event(self, session, event_index):
         if self.session is not session:
-            # clear the event image cache
-            self.get_event_data.cache_clear()
-            self.get_feature_data.cache_clear()
+            self.reset()
             self.session = session
             self.update_scatter_plots()
-        if self.session is None:
-            self.setEnabled(False)
-            self.groupBox_event.setTitle("Event")
-        else:
+        if self.session:
+            # Programatically, this is always the case, but for clarity,
+            # we use the `if self.session` case.
             self.setEnabled(True)
             self.groupBox_event.setTitle(
                 f"Event {event_index} (total {session.event_count}) ")

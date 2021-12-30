@@ -11,12 +11,6 @@ from helper import get_clean_data_path
 data_dir = pathlib.Path(__file__).parent / "data"
 
 
-def test_basic(qtbot):
-    """Run the program and exit"""
-    mw = DCTag()
-    mw.close()
-
-
 def test_empty_session(qtbot):
     mw = DCTag()
     QtWidgets.QApplication.setActiveWindow(mw)

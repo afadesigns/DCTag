@@ -66,11 +66,12 @@ class TabBinaryLabel(QtWidgets.QWidget):
         if self.session is not session:
             self.session = session
             self.event_index = 0
-        if self.session is None:
-            self.setEnabled(False)
-        else:
+        if self.session:
             self.setEnabled(True)
             self.goto_event(self.event_index)
+        else:
+            self.setEnabled(False)
+            self.widget_vis.reset(reset_plots=True)
 
     def goto_event(self, index):
         if index < 0:
