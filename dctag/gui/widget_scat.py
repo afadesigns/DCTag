@@ -26,12 +26,6 @@ class SimplePlotItem(pg.PlotItem):
         # visualization
         self.hideButtons()
 
-    def axes_to_front(self):
-        """Give the axes a high zValue"""
-        # bring axes to front
-        for kax in self.axes:
-            self.axes[kax]["item"].setZValue(900)
-
 
 class ScatterPlotWidget(pg.PlotWidget):
     """Custom class for data visualization in DCTag
