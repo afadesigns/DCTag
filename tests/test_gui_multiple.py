@@ -1,4 +1,5 @@
 import pathlib
+from unittest import mock
 
 from PyQt5 import QtCore, QtWidgets
 import pytest
@@ -41,6 +42,9 @@ def test_goto_event_limits(event_index, expected, qtbot):
     mw.tabWidget.setCurrentIndex(2)
     mw.tab_multiple.comboBox_score.setItemChecked(0, True)  # r1f
     mw.tab_multiple.comboBox_score.setItemChecked(1, True)  # r1u
+    assert mw.tab_multiple.comboBox_score.itemChecked(0)
+    assert mw.tab_multiple.comboBox_score.itemChecked(1)
+    assert not mw.tab_multiple.comboBox_score.itemChecked(2)
     # start labeling
     qtbot.mouseClick(mw.tab_multiple.pushButton_start, QtCore.Qt.LeftButton)
 
@@ -98,3 +102,133 @@ def test_goto_event_button_labels(qtbot):
     assert br1u.pushButton.text() == "[R1U]"
     assert mw.tab_multiple.label_score_prev.text() == "R1F"
     assert mw.tab_multiple.label_score_next.text() == "nan"
+
+
+def test_lock_in_twice(qtbot):
+    path = get_clean_data_path()
+    with session.DCTagSession(path, "dctag-tester") as dts:
+        dts.set_score("ml_score_r1f", 0, True)
+        dts.set_score("ml_score_r1f", 1, False)
+        dts.set_score("ml_score_r1f", 2, True)
+        dts.set_score("ml_score_r1f", 3, False)
+        dts.set_score("ml_score_r1u", 3, True)
+
+    mw = DCTag()
+    QtWidgets.QApplication.setActiveWindow(mw)
+    mw.on_action_open(path)
+    # select multiple tab
+    mw.tabWidget.setCurrentIndex(2)
+    mw.tab_multiple.comboBox_score.setItemChecked(0, True)  # r1f
+    mw.tab_multiple.comboBox_score.setItemChecked(1, True)  # r1u
+
+    qtbot.mouseClick(mw.tab_multiple.pushButton_start, QtCore.Qt.LeftButton)
+
+    assert len(mw.tab_multiple.label_buttons) == 2
+
+    br1f, br1u = mw.tab_multiple.label_buttons
+    assert br1f.pushButton.text() == "[R1F]"
+    assert br1u.pushButton.text() == "!R1U"  # because it auto-filled!
+    assert mw.tab_multiple.label_score_prev.text() == ""
+    assert mw.tab_multiple.label_score_next.text() == "nan"
+
+    # Now add another item and lock in again
+    mw.tabWidget.setCurrentIndex(0)
+    mw.tabWidget.setCurrentIndex(2)
+    mw.tab_multiple.comboBox_score.setItemChecked(0, True)  # r1f
+    mw.tab_multiple.comboBox_score.setItemChecked(1, True)  # r1u
+    mw.tab_multiple.comboBox_score.setItemChecked(2, True)  # r20
+
+    qtbot.mouseClick(mw.tab_multiple.pushButton_start, QtCore.Qt.LeftButton)
+
+    br1f, br1u, br20 = mw.tab_multiple.label_buttons
+    assert br1f.pushButton.text() == "[R1F]"
+    assert br1u.pushButton.text() == "!R1U"  # because it auto-filled!
+    assert br20.pushButton.text() == "!R20"  # because it auto-filled!
+
+
+def test_event_push_buttons(qtbot):
+    path = get_clean_data_path()
+    with session.DCTagSession(path, "dctag-tester") as dts:
+        dts.set_score("ml_score_r1f", 0, True)
+        dts.set_score("ml_score_r1f", 1, False)
+        dts.set_score("ml_score_r1u", 1, True)
+        dts.set_score("ml_score_r1f", 2, True)
+        dts.set_score("ml_score_r1f", 3, False)
+        dts.set_score("ml_score_r1u", 3, True)
+
+    mw = DCTag()
+    QtWidgets.QApplication.setActiveWindow(mw)
+    mw.on_action_open(path)
+    # select multiple tab
+    mw.tabWidget.setCurrentIndex(2)
+    mw.tab_multiple.comboBox_score.setItemChecked(0, True)  # r1f
+    mw.tab_multiple.comboBox_score.setItemChecked(1, True)  # r1u
+
+    qtbot.mouseClick(mw.tab_multiple.pushButton_start, QtCore.Qt.LeftButton)
+    assert mw.tab_multiple.event_index == 0
+    qtbot.mouseClick(mw.tab_multiple.pushButton_next, QtCore.Qt.LeftButton)
+    assert mw.tab_multiple.event_index == 1
+    qtbot.mouseClick(mw.tab_multiple.pushButton_fast_next,
+                     QtCore.Qt.LeftButton)
+    assert mw.tab_multiple.event_index == 4
+    qtbot.mouseClick(mw.tab_multiple.pushButton_prev, QtCore.Qt.LeftButton)
+    assert mw.tab_multiple.event_index == 3
+    qtbot.mouseClick(mw.tab_multiple.pushButton_fast_prev,
+                     QtCore.Qt.LeftButton)
+    assert mw.tab_multiple.event_index == 0
+
+    # now label a little
+    qtbot.mouseClick(mw.tab_multiple.pushButton_fast_next,
+                     QtCore.Qt.LeftButton)
+    assert mw.tab_multiple.event_index == 4
+    qtbot.mouseClick(mw.tab_multiple.label_buttons[0].pushButton,
+                     QtCore.Qt.LeftButton)
+    assert mw.tab_multiple.event_index == 5
+    assert mw.tab_multiple.label_score_prev.text() == "R1F"
+    qtbot.mouseClick(mw.tab_multiple.label_buttons[1].pushButton,
+                     QtCore.Qt.LeftButton)
+    assert mw.tab_multiple.event_index == 6
+    assert mw.tab_multiple.label_score_prev.text() == "R1U"
+
+    # go forward, label and then test fast_prev
+    qtbot.mouseClick(mw.tab_multiple.pushButton_next, QtCore.Qt.LeftButton)
+    qtbot.mouseClick(mw.tab_multiple.pushButton_next, QtCore.Qt.LeftButton)
+    assert mw.tab_multiple.event_index == 8
+    qtbot.mouseClick(mw.tab_multiple.label_buttons[1].pushButton,
+                     QtCore.Qt.LeftButton)
+    qtbot.mouseClick(mw.tab_multiple.label_buttons[1].pushButton,
+                     QtCore.Qt.LeftButton)
+    assert mw.tab_multiple.event_index == 10
+    qtbot.mouseClick(mw.tab_multiple.pushButton_fast_prev,
+                     QtCore.Qt.LeftButton)
+    assert mw.tab_multiple.event_index == 7
+
+    # go to the end and then test fast_next
+    mw.tab_multiple.goto_event(16)
+    assert mw.tab_multiple.event_index == 16
+    qtbot.mouseClick(mw.tab_multiple.label_buttons[1].pushButton,
+                     QtCore.Qt.LeftButton)
+    qtbot.mouseClick(mw.tab_multiple.label_buttons[1].pushButton,
+                     QtCore.Qt.LeftButton)
+    qtbot.mouseClick(mw.tab_multiple.pushButton_prev, QtCore.Qt.LeftButton)
+    qtbot.mouseClick(mw.tab_multiple.pushButton_prev, QtCore.Qt.LeftButton)
+    assert mw.tab_multiple.event_index == 15
+    qtbot.mouseClick(mw.tab_multiple.pushButton_fast_next,
+                     QtCore.Qt.LeftButton)
+    assert mw.tab_multiple.event_index == 17
+
+
+def test_start_without_events_checked(qtbot, monkeypatch):
+    path = get_clean_data_path()
+    with session.DCTagSession(path, "dctag-tester"):
+        pass
+    mw = DCTag()
+    QtWidgets.QApplication.setActiveWindow(mw)
+    mw.on_action_open(path)
+    # select multiple tab
+    mw.tabWidget.setCurrentIndex(2)
+
+    with mock.patch.object(QtWidgets.QMessageBox, "warning") as mc:
+        qtbot.mouseClick(mw.tab_multiple.pushButton_start,
+                         QtCore.Qt.LeftButton)
+        mc.assert_called_once()
