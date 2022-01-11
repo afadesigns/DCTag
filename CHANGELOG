@@ -1,6 +1,6 @@
 0.4.0
  - feat: implement `DCTagSession.reset_score` for resetting a
-   score to np.nan
+   score to np.nan (#26)
  - fix: repetitive tool tips in binary classification (#27)
 0.3.1
  - fix: minor labeling fix for previous/next in multiple tab
