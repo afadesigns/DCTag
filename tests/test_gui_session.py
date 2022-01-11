@@ -25,6 +25,7 @@ def test_error_session(qtbot):
     mw.tabWidget.setCurrentIndex(0)
     assert mw.tab_session.plainTextEdit_logs.toPlainText().startswith(
         "Cannot get logs from")
+    mw.close()
 
 
 def test_view_session(qtbot):
@@ -46,3 +47,4 @@ def test_view_session(qtbot):
         "ml_score_r1f")
     mw.on_action_close()
     assert mw.tab_session.plainTextEdit_logs.toPlainText() == "No session."
+    mw.close()

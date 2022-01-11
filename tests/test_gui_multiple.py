@@ -19,6 +19,7 @@ def test_empty_session(qtbot):
     mw.tabWidget.setCurrentIndex(2)
     # make sure things are disabled
     assert not mw.tab_multiple.isEnabled()
+    mw.close()
 
 
 @pytest.mark.parametrize("event_index,expected", [
@@ -51,6 +52,7 @@ def test_goto_event_limits(event_index, expected, qtbot):
     # go to event
     mw.tab_multiple.goto_event(event_index)
     assert mw.tab_multiple.event_index == expected
+    mw.close()
 
 
 def test_goto_event_button_labels(qtbot):
@@ -102,6 +104,7 @@ def test_goto_event_button_labels(qtbot):
     assert br1u.pushButton.text() == "[R1U]"
     assert mw.tab_multiple.label_score_prev.text() == "R1F"
     assert mw.tab_multiple.label_score_next.text() == "nan"
+    mw.close()
 
 
 def test_lock_in_twice(qtbot):
@@ -144,6 +147,7 @@ def test_lock_in_twice(qtbot):
     assert br1f.pushButton.text() == "[R1F]"
     assert br1u.pushButton.text() == "!R1U"  # because it auto-filled!
     assert br20.pushButton.text() == "!R20"  # because it auto-filled!
+    mw.close()
 
 
 def test_event_push_buttons(qtbot):
@@ -216,6 +220,7 @@ def test_event_push_buttons(qtbot):
     qtbot.mouseClick(mw.tab_multiple.pushButton_fast_next,
                      QtCore.Qt.LeftButton)
     assert mw.tab_multiple.event_index == 17
+    mw.close()
 
 
 def test_start_without_events_checked(qtbot, monkeypatch):
@@ -232,3 +237,4 @@ def test_start_without_events_checked(qtbot, monkeypatch):
         qtbot.mouseClick(mw.tab_multiple.pushButton_start,
                          QtCore.Qt.LeftButton)
         mc.assert_called_once()
+    mw.close()

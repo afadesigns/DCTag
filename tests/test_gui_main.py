@@ -70,6 +70,9 @@ def test_action_backup(with_delete, qtbot):
         assert h5["ml_score_r1f"][1] == 0
         assert h5["ml_score_r1f"][2] == 1
         assert np.isnan(h5["ml_score_r1f"][3])
+    # cleanup
+    mw.session = None
+    mw.close()
 
 
 def test_basic(qtbot):
@@ -100,6 +103,7 @@ def test_clear_session(qtbot):
     assert not mw.tab_binary.session
     assert not mw.tab_binary.widget_vis.session
     mw.tabWidget.setCurrentIndex(2)
+    mw.close()
 
 
 def test_init_get_username(qtbot):

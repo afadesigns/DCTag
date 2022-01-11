@@ -18,6 +18,7 @@ def test_empty_session(qtbot):
     mw.tabWidget.setCurrentIndex(1)
     # make sure things are disabled
     assert not mw.tab_binary.isEnabled()
+    mw.close()
 
 
 @pytest.mark.parametrize("event_index,expected", [
@@ -45,6 +46,7 @@ def test_goto_event_limits(event_index, expected, qtbot):
     # go to event
     mw.tab_binary.goto_event(event_index)
     assert mw.tab_binary.event_index == expected
+    mw.close()
 
 
 def test_goto_event_button_labels(qtbot):
@@ -79,6 +81,7 @@ def test_goto_event_button_labels(qtbot):
     assert mw.tab_binary.pushButton_no.text() == "[No]"
     assert mw.tab_binary.label_score_prev.text() == "Yes"
     assert mw.tab_binary.label_score_next.text() == "Yes"
+    mw.close()
 
 
 def test_event_push_buttons(qtbot):
@@ -138,6 +141,7 @@ def test_event_push_buttons(qtbot):
     assert mw.tab_binary.event_index == 15
     qtbot.mouseClick(mw.tab_binary.pushButton_fast_next, QtCore.Qt.LeftButton)
     assert mw.tab_binary.event_index == 17
+    mw.close()
 
 
 def test_session_load(qtbot):
@@ -177,3 +181,4 @@ def test_session_load(qtbot):
     assert mw.tab_binary.pushButton_yes.text() == "Yes"
     assert mw.tab_binary.pushButton_no.text() == "No"
     assert mw.tab_binary.label_score_next.text() == "Yes"
+    mw.close()
