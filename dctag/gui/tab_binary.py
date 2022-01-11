@@ -48,11 +48,11 @@ class TabBinaryLabel(QtWidgets.QWidget):
             for seq in shortcuts:
                 sc = QShortcut(QKeySequence(seq), self)
                 sc.activated.connect(button.click)
-                # include original ToolTip
-                tt = button.toolTip()
-                tt = tt + "; " if tt else ""
-                button.setToolTip(f"{tt}Shortcuts: {', '.join(shortcuts)}")
                 self.shortcuts.append(sc)  # keep a reference
+            # append shortcuts tool tip to original tool tip
+            tt = button.toolTip()
+            tt = tt + "; " if tt else ""
+            button.setToolTip(f"{tt}Shortcuts: {', '.join(shortcuts)}")
 
     @property
     def feature(self):
