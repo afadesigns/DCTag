@@ -22,7 +22,13 @@ class SimplePlotItem(pg.PlotItem):
                         autoExpandTextSpace=False,
                         showValues=False,
                         )
-        self.showGrid(x=True, y=True, alpha=.1)
+        # This screwed up zooming with right-click:
+        # self.showGrid(x=True, y=True, alpha=.1)
+        # Use the new GridItem instead:
+        grid = pg.GridItem()
+        grid.setTextPen("#FFFF")  # hide grid tick labels
+        self.addItem(grid)
+
         # visualization
         self.hideButtons()
 
@@ -39,7 +45,8 @@ class ScatterPlotWidget(pg.PlotWidget):
 
         self.scatter = RTDCScatterPlot()
         self.addItem(self.scatter)
-        self.select = pg.PlotDataItem(x=[1], y=[2], symbol="o")
+        self.select = pg.PlotDataItem(x=[1], y=[2], symbol="o",
+                                      symbolBrush="red")
         self.select.hide()
         self.addItem(self.select)
 

@@ -2,7 +2,7 @@ import functools
 import pkg_resources
 
 import numpy as np
-from PyQt5 import QtWidgets, uic
+from PyQt5 import QtCore, QtWidgets, uic
 from scipy.ndimage import binary_erosion
 
 import dclab
@@ -14,6 +14,7 @@ LIMITS_FEAT = {
     "area_um": [10, 130],
     "bright_avg": [70, 140],
     "bright_sd": [5, 35],
+    "time": None,
 }
 
 #: list with scatter plot axis features (there are three)
@@ -21,6 +22,7 @@ SCATTER_FEAT = [
     ["area_um", "deform"],
     ["area_um", "bright_avg"],
     ["bright_sd", "bright_avg"],
+    ["time", "bright_avg"],
 ]
 
 
@@ -36,6 +38,28 @@ class WidgetVisualize(QtWidgets.QWidget):
 
         self.session = None
 
+        self.scatter_plots = [self.scatter_1, self.scatter_2, self.scatter_3,
+                              self.scatter_4]
+
+        # linked axes
+        for ii, plota in enumerate(self.scatter_plots):
+            vba = plota.getViewBox()
+            for jj, plotb in enumerate(self.scatter_plots):
+                vbb = plotb.getViewBox()
+                if ii < jj:
+                    if SCATTER_FEAT[ii][0] == SCATTER_FEAT[jj][0]:
+                        vba.linkView(vba.XAxis, vbb)
+                    if SCATTER_FEAT[ii][1] == SCATTER_FEAT[jj][1]:
+                        vba.linkView(vba.YAxis, vbb)
+
+        # signals
+        self.checkBox_auto_contrast.stateChanged.connect(
+            self.update_image_cropped)
+        self.spinBox_contrast_max.valueChanged.connect(
+            self.update_image_cropped)
+        self.spinBox_contrast_min.valueChanged.connect(
+            self.update_image_cropped)
+
     def reset(self, reset_plots=False):
         """Clear current visualization"""
         # clear the event image cache
@@ -48,8 +72,8 @@ class WidgetVisualize(QtWidgets.QWidget):
             self.image_channel.clear()
             self.image_channel_contour.clear()
             self.image_cropped.clear()
-            for plot in [self.scatter_1, self.scatter_2, self.scatter_3]:
-                plot.clear()
+            for plot in self.scatter_plots:
+                plot.set_scatter(np.arange(10), np.arange(10))
 
     @functools.lru_cache(maxsize=900)
     def get_feature_data(self, feature):
@@ -75,7 +99,7 @@ class WidgetVisualize(QtWidgets.QWidget):
             self.session = session
             self.update_scatter_plots()
         if self.session:
-            # Programatically, this is always the case, but for clarity,
+            # Programmatically, this is always the case, but for clarity,
             # we use the `if self.session` case.
             self.setEnabled(True)
             self.groupBox_event.setTitle(
@@ -90,21 +114,43 @@ class WidgetVisualize(QtWidgets.QWidget):
             self.image_channel_contour.setImage(image_contour)
             # cropped image
             image_cropped = get_cropped_image(data)
-            self.image_cropped.setImage(image_cropped)
+            self.update_image_cropped(image_cropped)
             # Plot event in the scatter plots
-            for plot, [featx, featy] in zip(
-                    [self.scatter_1, self.scatter_2, self.scatter_3],
-                    SCATTER_FEAT):
+            for plot, [featx, featy] in zip(self.scatter_plots, SCATTER_FEAT):
                 plot.set_event(data[featx], data[featy])
 
+    @QtCore.pyqtSlot()
+    def update_image_cropped(self, image_cropped=None):
+        """Udpate the cropped image on the right
+
+        This handles auto-contrast.
+        """
+        if image_cropped is None:
+            # use the current data
+            image_cropped = self.image_cropped.image
+        if self.checkBox_auto_contrast.isChecked():
+            levels = (image_cropped.min(), image_cropped.max())
+        else:
+            levels = (self.spinBox_contrast_min.value(),
+                      self.spinBox_contrast_max.value())
+        self.image_cropped.setImage(image_cropped, autoLevels=False,
+                                    levels=levels)
+        # make sure levels are shown in UI
+        self.spinBox_contrast_min.blockSignals(True)
+        self.spinBox_contrast_min.setValue(levels[0])
+        self.spinBox_contrast_min.blockSignals(False)
+        self.spinBox_contrast_max.blockSignals(True)
+        self.spinBox_contrast_max.setValue(levels[1])
+        self.spinBox_contrast_max.blockSignals(False)
+
     def update_scatter_plots(self):
-        for plot, [featx, featy] in zip(
-                [self.scatter_1, self.scatter_2, self.scatter_3],
-                SCATTER_FEAT):
+        for plot, [featx, featy] in zip(self.scatter_plots, SCATTER_FEAT):
             plot.set_scatter(self.get_feature_data(featx),
                              self.get_feature_data(featy))
-            plot.setXRange(*LIMITS_FEAT[featx])
-            plot.setYRange(*LIMITS_FEAT[featy])
+            if LIMITS_FEAT[featx] is not None:
+                plot.setXRange(*LIMITS_FEAT[featx])
+            if LIMITS_FEAT[featy] is not None:
+                plot.setYRange(*LIMITS_FEAT[featy])
             plot.setLabel('bottom', dclab.dfn.get_feature_label(featx))
             plot.setLabel('left', dclab.dfn.get_feature_label(featy))
 
