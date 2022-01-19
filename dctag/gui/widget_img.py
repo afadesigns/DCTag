@@ -14,3 +14,6 @@ class SimpleImageView(pg.ImageView):
         # disable keyboard shortcuts
         self.keyPressEvent = lambda _: None
         self.keyReleaseEvent = lambda _: None
+
+    def getViewBox(self):
+        return self.getPlotItem().getViewBox()

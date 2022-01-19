@@ -38,6 +38,20 @@ class WidgetVisualize(QtWidgets.QWidget):
 
         self.session = None
 
+        self.scatter_plots = [self.scatter_1, self.scatter_2, self.scatter_3,
+                              self.scatter_4]
+
+        # linked axes
+        for ii, plota in enumerate(self.scatter_plots):
+            vba = plota.getViewBox()
+            for jj, plotb in enumerate(self.scatter_plots):
+                vbb = plotb.getViewBox()
+                if ii < jj:
+                    if SCATTER_FEAT[ii][0] == SCATTER_FEAT[jj][0]:
+                        vba.linkView(vba.XAxis, vbb)
+                    if SCATTER_FEAT[ii][1] == SCATTER_FEAT[jj][1]:
+                        vba.linkView(vba.YAxis, vbb)
+
         # signals
         self.checkBox_auto_contrast.stateChanged.connect(
             self.update_image_cropped)
@@ -58,7 +72,7 @@ class WidgetVisualize(QtWidgets.QWidget):
             self.image_channel.clear()
             self.image_channel_contour.clear()
             self.image_cropped.clear()
-            for plot in [self.scatter_1, self.scatter_2, self.scatter_3]:
+            for plot in self.scatter_plots:
                 plot.clear()
 
     @functools.lru_cache(maxsize=900)
@@ -102,10 +116,7 @@ class WidgetVisualize(QtWidgets.QWidget):
             image_cropped = get_cropped_image(data)
             self.update_image_cropped(image_cropped)
             # Plot event in the scatter plots
-            for plot, [featx, featy] in zip(
-                    [self.scatter_1, self.scatter_2, self.scatter_3,
-                     self.scatter_4],
-                    SCATTER_FEAT):
+            for plot, [featx, featy] in zip(self.scatter_plots, SCATTER_FEAT):
                 plot.set_event(data[featx], data[featy])
 
     @QtCore.pyqtSlot()
@@ -133,10 +144,7 @@ class WidgetVisualize(QtWidgets.QWidget):
         self.spinBox_contrast_max.blockSignals(False)
 
     def update_scatter_plots(self):
-        for plot, [featx, featy] in zip(
-                [self.scatter_1, self.scatter_2, self.scatter_3,
-                 self.scatter_4],
-                SCATTER_FEAT):
+        for plot, [featx, featy] in zip(self.scatter_plots, SCATTER_FEAT):
             plot.set_scatter(self.get_feature_data(featx),
                              self.get_feature_data(featy))
             if LIMITS_FEAT[featx] is not None:
