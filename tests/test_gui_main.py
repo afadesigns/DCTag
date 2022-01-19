@@ -77,12 +77,6 @@ def test_action_backup(with_delete, qtbot):
     mw.close()
 
 
-def test_basic(qtbot):
-    """Run the program and exit"""
-    mw = DCTag()
-    mw.close()
-
-
 def test_clear_session(qtbot):
     """Clearing the session should not cause any trouble"""
     path = get_clean_data_path()
@@ -105,6 +99,12 @@ def test_clear_session(qtbot):
     assert not mw.tab_binary.session
     assert not mw.tab_binary.widget_vis.session
     mw.tabWidget.setCurrentIndex(2)
+    mw.close()
+
+
+def test_basic(qtbot):
+    """Run the program and exit"""
+    mw = DCTag()
     mw.close()
 
 
