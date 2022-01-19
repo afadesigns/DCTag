@@ -241,6 +241,7 @@ class DCTag(QtWidgets.QMainWindow):
                 success = True
         return success
 
+    @QtCore.pyqtSlot()
     def session_flush_statusbar(self):
         """Flush the session, writing all changes to the file
 
