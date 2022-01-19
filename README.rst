@@ -56,6 +56,7 @@ Here is how we manage contributions:
       # For this to work you have to go to your fork, "Settings". "Repository"
       # "Protected branches" and activate "Allowed to force push" for ``main`` in the list.
       git push origin main --force
+      git push --tags
 
 6. Activate your virtual environment and install dctag in editable mode::
 
