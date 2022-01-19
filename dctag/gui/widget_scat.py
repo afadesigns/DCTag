@@ -39,7 +39,8 @@ class ScatterPlotWidget(pg.PlotWidget):
 
         self.scatter = RTDCScatterPlot()
         self.addItem(self.scatter)
-        self.select = pg.PlotDataItem(x=[1], y=[2], symbol="o", symbolBrush="red")
+        self.select = pg.PlotDataItem(x=[1], y=[2], symbol="o",
+                                      symbolBrush="red")
         self.select.hide()
         self.addItem(self.select)
 

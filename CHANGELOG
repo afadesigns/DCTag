@@ -1,5 +1,7 @@
 0.4.1
- - enh: use red plot marker in visualization widget
+ - enh: use red plot marker in visualization widget (#32)
+ - enh: disable auto-contrast by default for the cropped image,
+   but allow to enable it again (#32)
 0.4.0
  - feat: add trash icon in GUI for resetting a score (#26)
  - feat: implement `DCTagSession.reset_score` for resetting a

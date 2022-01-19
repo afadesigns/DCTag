@@ -2,7 +2,7 @@ import functools
 import pkg_resources
 
 import numpy as np
-from PyQt5 import QtWidgets, uic
+from PyQt5 import QtCore, QtWidgets, uic
 from scipy.ndimage import binary_erosion
 
 import dclab
@@ -35,6 +35,14 @@ class WidgetVisualize(QtWidgets.QWidget):
         uic.loadUi(ui_file, self)
 
         self.session = None
+
+        # signals
+        self.checkBox_auto_contrast.stateChanged.connect(
+            self.update_image_cropped)
+        self.spinBox_contrast_max.valueChanged.connect(
+            self.update_image_cropped)
+        self.spinBox_contrast_min.valueChanged.connect(
+            self.update_image_cropped)
 
     def reset(self, reset_plots=False):
         """Clear current visualization"""
@@ -75,7 +83,7 @@ class WidgetVisualize(QtWidgets.QWidget):
             self.session = session
             self.update_scatter_plots()
         if self.session:
-            # Programatically, this is always the case, but for clarity,
+            # Programmatically, this is always the case, but for clarity,
             # we use the `if self.session` case.
             self.setEnabled(True)
             self.groupBox_event.setTitle(
@@ -90,12 +98,36 @@ class WidgetVisualize(QtWidgets.QWidget):
             self.image_channel_contour.setImage(image_contour)
             # cropped image
             image_cropped = get_cropped_image(data)
-            self.image_cropped.setImage(image_cropped)
+            self.update_image_cropped(image_cropped)
             # Plot event in the scatter plots
             for plot, [featx, featy] in zip(
                     [self.scatter_1, self.scatter_2, self.scatter_3],
                     SCATTER_FEAT):
                 plot.set_event(data[featx], data[featy])
+
+    @QtCore.pyqtSlot()
+    def update_image_cropped(self, image_cropped=None):
+        """Udpate the cropped image on the right
+
+        This handles auto-contrast.
+        """
+        if image_cropped is None:
+            # use the current data
+            image_cropped = self.image_cropped.image
+        if self.checkBox_auto_contrast.isChecked():
+            levels = (image_cropped.min(), image_cropped.max())
+        else:
+            levels = (self.spinBox_contrast_min.value(),
+                      self.spinBox_contrast_max.value())
+        self.image_cropped.setImage(image_cropped, autoLevels=False,
+                                    levels=levels)
+        # make sure levels are shown in UI
+        self.spinBox_contrast_min.blockSignals(True)
+        self.spinBox_contrast_min.setValue(levels[0])
+        self.spinBox_contrast_min.blockSignals(False)
+        self.spinBox_contrast_max.blockSignals(True)
+        self.spinBox_contrast_max.setValue(levels[1])
+        self.spinBox_contrast_max.blockSignals(False)
 
     def update_scatter_plots(self):
         for plot, [featx, featy] in zip(
