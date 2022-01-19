@@ -1,5 +1,6 @@
 import io
 import pathlib
+import time
 from unittest import mock
 
 import h5py
@@ -35,7 +36,7 @@ def run_around_tests():
 
 
 @pytest.mark.parametrize("with_delete", [True, False])
-def test_action_backup(with_delete, qtbot):
+def stest_action_backup(with_delete, qtbot):
     # setup a nice session
     path = get_clean_data_path()
     mw = DCTag()
@@ -77,6 +78,14 @@ def test_action_backup(with_delete, qtbot):
     mw.close()
 
 
+def test_basic(qtbot):
+    """Run the program and exit"""
+    mw = DCTag()
+    time.sleep(.5)
+    QtWidgets.QApplication.processEvents(QtCore.QEventLoop.AllEvents, 3000)
+    mw.close()
+
+
 def test_clear_session(qtbot):
     """Clearing the session should not cause any trouble"""
     path = get_clean_data_path()
@@ -99,12 +108,6 @@ def test_clear_session(qtbot):
     assert not mw.tab_binary.session
     assert not mw.tab_binary.widget_vis.session
     mw.tabWidget.setCurrentIndex(2)
-    mw.close()
-
-
-def test_basic(qtbot):
-    """Run the program and exit"""
-    mw = DCTag()
     mw.close()
 
 
