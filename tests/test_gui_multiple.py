@@ -32,6 +32,7 @@ def run_around_tests():
 
 def test_empty_session(qtbot):
     mw = DCTag()
+    qtbot.addWidget(mw)
     QtWidgets.QApplication.setActiveWindow(mw)
     # select multiple tab
     mw.tabWidget.setCurrentIndex(2)
@@ -51,6 +52,7 @@ def test_empty_session(qtbot):
 def test_goto_event_limits(event_index, expected, qtbot):
     path = get_clean_data_path()
     mw = DCTag()
+    qtbot.addWidget(mw)
     QtWidgets.QApplication.setActiveWindow(mw)
     # claim session
     with session.DCTagSession(path, "dctag-tester"):
@@ -83,6 +85,7 @@ def test_goto_event_button_labels(qtbot):
         dts.set_score("ml_score_r1u", 3, True)
 
     mw = DCTag()
+    qtbot.addWidget(mw)
     QtWidgets.QApplication.setActiveWindow(mw)
     mw.on_action_open(path)
     # select multiple tab
@@ -135,6 +138,7 @@ def test_lock_in_twice(qtbot):
         dts.set_score("ml_score_r1u", 3, True)
 
     mw = DCTag()
+    qtbot.addWidget(mw)
     QtWidgets.QApplication.setActiveWindow(mw)
     mw.on_action_open(path)
     # select multiple tab
@@ -179,6 +183,7 @@ def test_event_push_buttons(qtbot):
         dts.set_score("ml_score_r1u", 3, True)
 
     mw = DCTag()
+    qtbot.addWidget(mw)
     QtWidgets.QApplication.setActiveWindow(mw)
     mw.on_action_open(path)
     # select multiple tab
@@ -246,6 +251,7 @@ def test_start_without_events_checked(qtbot, monkeypatch):
     with session.DCTagSession(path, "dctag-tester"):
         pass
     mw = DCTag()
+    qtbot.addWidget(mw)
     QtWidgets.QApplication.setActiveWindow(mw)
     mw.on_action_open(path)
     # select multiple tab

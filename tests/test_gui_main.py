@@ -40,6 +40,7 @@ def stest_action_backup(with_delete, qtbot):
     # setup a nice session
     path = get_clean_data_path()
     mw = DCTag()
+    qtbot.addWidget(mw)
     QtWidgets.QApplication.setActiveWindow(mw)
     # claim session
     with session.DCTagSession(path, "dctag-tester"):
@@ -81,6 +82,8 @@ def stest_action_backup(with_delete, qtbot):
 def test_basic(qtbot):
     """Run the program and exit"""
     mw = DCTag()
+    qtbot.addWidget(mw)
+    QtWidgets.QApplication.setActiveWindow(mw)
     time.sleep(.5)
     QtWidgets.QApplication.processEvents(QtCore.QEventLoop.AllEvents, 3000)
     mw.close()
@@ -90,6 +93,7 @@ def test_clear_session(qtbot):
     """Clearing the session should not cause any trouble"""
     path = get_clean_data_path()
     mw = DCTag()
+    qtbot.addWidget(mw)
     QtWidgets.QApplication.setActiveWindow(mw)
     # claim session
     with session.DCTagSession(path, "dctag-tester"):

@@ -32,6 +32,7 @@ def run_around_tests():
 def test_error_session(qtbot):
     path = get_clean_data_path()
     mw = DCTag()
+    qtbot.addWidget(mw)
     QtWidgets.QApplication.setActiveWindow(mw)
     with session.DCTagSession(path, "dctag-tester") as dts:
         dts.set_score("ml_score_r1f", 0, True)
@@ -51,6 +52,7 @@ def test_view_session(qtbot):
     """Clearing the session should not cause any trouble"""
     path = get_clean_data_path()
     mw = DCTag()
+    qtbot.addWidget(mw)
     QtWidgets.QApplication.setActiveWindow(mw)
     # make sure there is no session
     assert mw.tab_session.plainTextEdit_logs.toPlainText() == "No session."

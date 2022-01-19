@@ -31,6 +31,7 @@ def run_around_tests():
 
 def test_empty_session(qtbot):
     mw = DCTag()
+    qtbot.addWidget(mw)
     QtWidgets.QApplication.setActiveWindow(mw)
     # select binary tab
     mw.tabWidget.setCurrentIndex(1)
@@ -50,6 +51,7 @@ def test_empty_session(qtbot):
 def test_goto_event_limits(event_index, expected, qtbot):
     path = get_clean_data_path()
     mw = DCTag()
+    qtbot.addWidget(mw)
     QtWidgets.QApplication.setActiveWindow(mw)
     # claim session
     with session.DCTagSession(path, "dctag-tester"):
@@ -76,6 +78,7 @@ def test_goto_event_button_labels(qtbot):
         dts.set_score("ml_score_r1f", 3, False)
 
     mw = DCTag()
+    qtbot.addWidget(mw)
     QtWidgets.QApplication.setActiveWindow(mw)
     mw.on_action_open(path)
     # select binary tab
@@ -111,6 +114,7 @@ def test_event_push_buttons(qtbot):
         dts.set_score("ml_score_r1f", 3, False)
 
     mw = DCTag()
+    qtbot.addWidget(mw)
     QtWidgets.QApplication.setActiveWindow(mw)
     mw.on_action_open(path)
     # select binary tab
@@ -178,6 +182,7 @@ def test_session_load(qtbot):
         assert dts.get_scores_true(4) == []
 
     mw = DCTag()
+    qtbot.addWidget(mw)
     QtWidgets.QApplication.setActiveWindow(mw)
     mw.on_action_open(path)
     # select binary tab
