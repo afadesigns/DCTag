@@ -18,11 +18,12 @@ data_dir = pathlib.Path(__file__).parent / "data"
 
 @pytest.fixture(autouse=True)
 def run_around_tests():
-    # Code that will run before your test, for example:
+    # Code that will run before your test
+    QtWidgets.QApplication.processEvents(QtCore.QEventLoop.AllEvents, 3000)
     pass
     # A test function will be run at this point
     yield
-    # Code that will run after your test, for example:
+    # Code that will run after your test
     # restore dctag-tester for other tests
     QtCore.QCoreApplication.setOrganizationName("MPL")
     QtCore.QCoreApplication.setOrganizationDomain("mpl.mpg.de")
@@ -30,6 +31,7 @@ def run_around_tests():
     QtCore.QSettings.setDefaultFormat(QtCore.QSettings.IniFormat)
     settings = QtCore.QSettings()
     settings.setValue("user/name", "dctag-tester")
+    QtWidgets.QApplication.processEvents(QtCore.QEventLoop.AllEvents, 3000)
 
 
 @pytest.mark.parametrize("with_delete", [True, False])
