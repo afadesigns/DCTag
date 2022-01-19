@@ -1,3 +1,5 @@
+0.4.2
+ - ci: improved testing pipeline
 0.4.1
  - enh: use red plot marker in visualization widget (#32)
  - enh: disable auto-contrast by default for the cropped image,
