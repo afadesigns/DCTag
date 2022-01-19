@@ -73,7 +73,7 @@ class WidgetVisualize(QtWidgets.QWidget):
             self.image_channel_contour.clear()
             self.image_cropped.clear()
             for plot in self.scatter_plots:
-                plot.clear()
+                plot.set_scatter(np.arange(10), np.arange(10))
 
     @functools.lru_cache(maxsize=900)
     def get_feature_data(self, feature):

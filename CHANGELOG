@@ -5,6 +5,8 @@
  - enh: add brightness vs. time plot (#32)
  - enh: link axes with same feature
  - fix: zoom with right-click on scatter plots had weird origin
+ - fix: do not "clear" plots, otherwise scatter plots are empty
+   for new sessions
 0.4.0
  - feat: add trash icon in GUI for resetting a score (#26)
  - feat: implement `DCTagSession.reset_score` for resetting a
