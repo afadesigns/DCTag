@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>992</width>
-    <height>633</height>
+    <width>1027</width>
+    <height>631</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -105,15 +105,29 @@
          <property name="bottomMargin">
           <number>0</number>
          </property>
-         <item alignment="Qt::AlignTop">
-          <widget class="QPushButton" name="pushButton_fast_prev">
-           <property name="toolTip">
-            <string>Skip to last unlabeled event</string>
-           </property>
-           <property name="text">
-            <string>&lt;&lt;</string>
-           </property>
-          </widget>
+         <item>
+          <layout class="QVBoxLayout" name="verticalLayout_6">
+           <item>
+            <widget class="QPushButton" name="pushButton_fast_prev">
+             <property name="toolTip">
+              <string>Skip to last unlabeled event</string>
+             </property>
+             <property name="text">
+              <string>&lt;&lt;</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QSpinBox" name="spinBox_jump_to">
+             <property name="toolTip">
+              <string>Event index, edit to jump to event</string>
+             </property>
+             <property name="minimum">
+              <number>1</number>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </item>
          <item>
           <layout class="QVBoxLayout" name="verticalLayout_3">

@@ -122,6 +122,7 @@ class TabMultiClassLabel(QtWidgets.QWidget):
         self.pushButton_fast_next.clicked.connect(self.on_event_button)
         self.pushButton_fast_prev.clicked.connect(self.on_event_button)
         self.toolButton_reset.clicked.connect(self.on_event_button)
+        self.spinBox_jump_to.valueChanged.connect(self.on_jump_to)
 
         self.toolButton_reset.setIcon(self.style().standardIcon(
             QtWidgets.QStyle.SP_TrashIcon))
@@ -161,6 +162,7 @@ class TabMultiClassLabel(QtWidgets.QWidget):
             self.event_index = 0
         if self.session:
             self.setEnabled(True)
+            self.spinBox_jump_to.setMaximum(self.session.event_count)
             self.goto_event(self.event_index)
         else:
             self.setEnabled(False)
@@ -202,6 +204,11 @@ class TabMultiClassLabel(QtWidgets.QWidget):
             for button in self.label_buttons:
                 score = self.session.get_score(button.feature, index)
                 button.set_score(score)
+
+        # update spinBox_jump_to
+        self.spinBox_jump_to.blockSignals(True)
+        self.spinBox_jump_to.setValue(self.event_index + 1)
+        self.spinBox_jump_to.blockSignals(False)
 
         # update progress bar
         if self.features:
@@ -275,6 +282,10 @@ class TabMultiClassLabel(QtWidgets.QWidget):
     def on_event_button_feature(self, feature):
         self.session.set_score(feature, self.event_index, True)
         self.goto_event(self.event_index + 1)
+
+    @QtCore.pyqtSlot(int)
+    def on_jump_to(self, event_index):
+        self.goto_event(event_index - 1)
 
     @QtCore.pyqtSlot()
     def on_start(self):
