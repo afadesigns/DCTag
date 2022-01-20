@@ -145,8 +145,11 @@ class WidgetVisualize(QtWidgets.QWidget):
 
     def update_scatter_plots(self):
         for plot, [featx, featy] in zip(self.scatter_plots, SCATTER_FEAT):
-            plot.set_scatter(self.get_feature_data(featx),
-                             self.get_feature_data(featy))
+            with dclab.new_dataset(self.session.path) as ds:
+                x, y = ds.get_downsampled_scatter(xax=featx,
+                                                  yax=featy,
+                                                  downsample=10000)
+            plot.set_scatter(x, y)
             if LIMITS_FEAT[featx] is not None:
                 plot.setXRange(*LIMITS_FEAT[featx])
             if LIMITS_FEAT[featy] is not None:
