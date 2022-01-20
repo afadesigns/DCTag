@@ -14,16 +14,16 @@ Depending on how you set up GitLab, one of those commands will work::
     pip install dctag@git+ssh://git@gitlab.gwdg.de/blood_data_analysis/dctag.git@X.Y.Z
     pip install dctag@git+https://gitlab.gwdg.de/blood_data_analysis/dctag.git@X.Y.Z
 
-where ``X.Y.Z`` is the version of DCTag you are interested in. E.g. to install DCTag 0.4.0 via SSH
+where ``X.Y.Z`` is the version of DCTag you are interested in. E.g. to install DCTag 0.4.1 via SSH
 (works if you have two-factor authentication enabled), run::
 
-    pip install dctag@git+ssh://git@gitlab.gwdg.de/blood_data_analysis/dctag.git@0.4.0
+    pip install dctag@git+ssh://git@gitlab.gwdg.de/blood_data_analysis/dctag.git@0.4.1
 
 Windows users please note that this might only work with git bash.
 
 To **upgrade** to a new version, use the ``--upgrade`` argument::
 
-    pip install --upgrade dctag@git+ssh://git@gitlab.gwdg.de/blood_data_analysis/dctag.git@0.4.0
+    pip install --upgrade dctag@git+ssh://git@gitlab.gwdg.de/blood_data_analysis/dctag.git@0.4.1
 
 For more information and some more examples, please see `issue #9 <https://gitlab.gwdg.de/blood_data_analysis/dctag/-/issues/9>`_.
 
