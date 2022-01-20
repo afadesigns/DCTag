@@ -1,4 +1,5 @@
 0.4.2
+ - enh: add dctag icon
  - ci: improved testing pipeline
 0.4.1
  - enh: use red plot marker in visualization widget (#32)
