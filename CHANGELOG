@@ -1,5 +1,6 @@
 0.4.2
- - enh: add dctag icon
+ - fix: reduce labeling lag by downsampling scatter plot (#31)
+ - feat: add jump-to-event option via spinBox (#30)
  - ci: improved testing pipeline
 0.4.1
  - enh: use red plot marker in visualization widget (#32)

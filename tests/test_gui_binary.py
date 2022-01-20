@@ -205,3 +205,59 @@ def test_session_load(qtbot):
     assert mw.tab_binary.pushButton_no.text() == "No"
     assert mw.tab_binary.label_score_next.text() == "Yes"
     mw.close()
+
+
+@pytest.mark.parametrize("event_index,expected", [
+    [-10, 0],
+    [-1, 0],
+    [0, 0],
+    [16, 16],
+    [17, 17],
+    [18, 17],
+    [5000, 17]])
+def test_on_spin(event_index, expected, qtbot):
+    path = get_clean_data_path()
+    mw = DCTag()
+    QtWidgets.QApplication.setActiveWindow(mw)
+    # claim session
+    with session.DCTagSession(path, "dctag-tester"):
+        pass
+    # open session
+    mw.on_action_open(path)
+    # select binary tab
+    mw.tabWidget.setCurrentIndex(1)
+    # add spinbox
+    qtbot.addWidget(mw.tab_binary.spinBox_jump_to)
+    # set spinBox
+    mw.tab_binary.spinBox_jump_to.setValue(event_index + 1)
+    # check if event_index is updated correspondingly
+    assert mw.tab_binary.event_index == expected
+    mw.close()
+
+
+@pytest.mark.parametrize("event_index,expected", [
+    [-10, 0],
+    [-1, 0],
+    [0, 0],
+    [16, 16],
+    [17, 17],
+    [18, 17],
+    [5000, 17]])
+def test_update_spinBox(event_index, expected, qtbot):
+    path = get_clean_data_path()
+    mw = DCTag()
+    QtWidgets.QApplication.setActiveWindow(mw)
+    # claim session
+    with session.DCTagSession(path, "dctag-tester"):
+        pass
+    # open session
+    mw.on_action_open(path)
+    # select binary tab
+    mw.tabWidget.setCurrentIndex(1)
+    # add spinbox
+    qtbot.addWidget(mw.tab_binary.spinBox_jump_to)
+
+    mw.tab_binary.goto_event(event_index)
+    # check if spinBox is updated correspondingly
+    assert mw.tab_binary.spinBox_jump_to.value() == expected + 1
+    mw.close()

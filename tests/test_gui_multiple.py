@@ -262,3 +262,59 @@ def test_start_without_events_checked(qtbot, monkeypatch):
                          QtCore.Qt.LeftButton)
         mc.assert_called_once()
     mw.close()
+
+
+@pytest.mark.parametrize("event_index,expected", [
+    [-10, 0],
+    [-1, 0],
+    [0, 0],
+    [16, 16],
+    [17, 17],
+    [18, 17],
+    [5000, 17]])
+def test_on_spin(event_index, expected, qtbot):
+    path = get_clean_data_path()
+    mw = DCTag()
+    QtWidgets.QApplication.setActiveWindow(mw)
+    # claim session
+    with session.DCTagSession(path, "dctag-tester"):
+        pass
+    # open session
+    mw.on_action_open(path)
+    # select multiple tab
+    mw.tabWidget.setCurrentIndex(2)
+    # add spinbox
+    qtbot.addWidget(mw.tab_multiple.spinBox_jump_to)
+    # set spinBox value
+    mw.tab_multiple.spinBox_jump_to.setValue(event_index + 1)
+    # check if event_index is updated correspondingly
+    assert mw.tab_multiple.event_index == expected
+    mw.close()
+
+
+@pytest.mark.parametrize("event_index,expected", [
+    [-10, 0],
+    [-1, 0],
+    [0, 0],
+    [16, 16],
+    [17, 17],
+    [18, 17],
+    [5000, 17]])
+def test_update_spinBox(event_index, expected, qtbot):
+    path = get_clean_data_path()
+    mw = DCTag()
+    QtWidgets.QApplication.setActiveWindow(mw)
+    # claim session
+    with session.DCTagSession(path, "dctag-tester"):
+        pass
+    # open session
+    mw.on_action_open(path)
+    # select multiple tab
+    mw.tabWidget.setCurrentIndex(2)
+    # add spinbox
+    qtbot.addWidget(mw.tab_multiple.spinBox_jump_to)
+
+    mw.tab_multiple.goto_event(event_index)
+    # check if spinBox is updated correspondingly
+    assert mw.tab_multiple.spinBox_jump_to.value() == expected + 1
+    mw.close()
