@@ -35,6 +35,7 @@ class TabBinaryLabel(QtWidgets.QWidget):
         self.pushButton_fast_next.clicked.connect(self.on_event_button)
         self.pushButton_fast_prev.clicked.connect(self.on_event_button)
         self.toolButton_reset.clicked.connect(self.on_event_button)
+        self.spinBox_jump_to.valueChanged.connect(self.on_jump_to)
 
         self.toolButton_reset.setIcon(self.style().standardIcon(
             QtWidgets.QStyle.SP_TrashIcon))
@@ -73,6 +74,7 @@ class TabBinaryLabel(QtWidgets.QWidget):
             self.event_index = 0
         if self.session:
             self.setEnabled(True)
+            self.spinBox_jump_to.setMaximum(self.session.event_count)
             self.goto_event(self.event_index)
         else:
             self.setEnabled(False)
@@ -121,6 +123,11 @@ class TabBinaryLabel(QtWidgets.QWidget):
                     no = "[No]"
         self.pushButton_no.setText(no)
         self.pushButton_yes.setText(yes)
+
+        # update spinBox_jump_to
+        self.spinBox_jump_to.blockSignals(True)
+        self.spinBox_jump_to.setValue(self.event_index + 1)
+        self.spinBox_jump_to.blockSignals(False)
 
         # update progress bar
         if self.feature:
@@ -181,6 +188,10 @@ class TabBinaryLabel(QtWidgets.QWidget):
         elif btn is self.toolButton_reset:
             self.session.reset_score(self.feature, self.event_index)
             self.goto_event(self.event_index + 1)
+
+    @QtCore.pyqtSlot(int)
+    def on_jump_to(self, event_index):
+        self.goto_event(event_index - 1)
 
     @QtCore.pyqtSlot()
     def on_start(self):
