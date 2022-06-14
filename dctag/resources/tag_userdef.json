@@ -1,0 +1,30 @@
+{
+  "userdef1": {
+    "label": "User-defined 1",
+    "shortcut": "1"
+    },
+  "userdef2": {
+    "label": "User-defined 2",
+    "shortcut": "2"
+    },
+  "userdef3": {
+    "label": "User-defined 3",
+    "shortcut": "3"
+  },
+  "userdef4": {
+    "label": "User-defined 4",
+    "shortcut": "4"
+  },
+  "userdef5": {
+    "label": "User-defined 5",
+    "shortcut": "5"
+  },
+  "userdef6": {
+    "label": "User-defined 6",
+    "shortcut": "6"
+  },
+  "userdef7": {
+    "label": "User-defined 7",
+    "shortcut": "7"
+  }
+}

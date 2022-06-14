@@ -339,9 +339,9 @@ def test_set_score_with_linked_features():
 def test_set_score_wrong_feature_error():
     path = get_clean_data_path()
     with session.DCTagSession(path, "Peter") as dts:
-        with pytest.raises(ValueError, match="Expected 'ml_score_xxx' featu"):
+        with pytest.raises(ValueError, match="Expected 'ml_score_xxx' or"):
             dts.set_score("volume", 0, True)
-        with pytest.raises(ValueError, match="Expected 'ml_score_xxx' featu"):
+        with pytest.raises(ValueError, match="Expected 'ml_score_xxx' or"):
             dts.set_score("ml_flore_abc", 0, True)
 
 

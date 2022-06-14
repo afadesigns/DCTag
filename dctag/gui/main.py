@@ -12,6 +12,7 @@ import numpy
 from PyQt5 import uic, QtCore, QtWidgets
 import pyqtgraph as pg
 
+from .. import scores
 from .. import session
 from .._version import version
 
@@ -70,6 +71,8 @@ class DCTag(QtWidgets.QMainWindow):
         self.actionOpen.triggered.connect(self.on_action_open)
         self.actionQuit.triggered.connect(self.on_action_quit)
         self.actionClose.triggered.connect(self.on_action_close)
+        # Preferences menu
+        self.actionSelectLabels.triggered.connect(self.on_action_select_labels)
         # Session menu
         self.actionFlushSession.triggered.connect(self.on_action_flush)
         self.actionBackupSession.triggered.connect(self.on_action_backup)
@@ -195,6 +198,28 @@ class DCTag(QtWidgets.QMainWindow):
     def on_action_quit(self, force=True):
         if force or self.session_close():
             QtCore.QCoreApplication.quit()
+
+    @QtCore.pyqtSlot()
+    def on_action_select_labels(self):
+        """Let the user select a labeling group"""
+        # get available labels
+        groups = scores.get_available_label_groups()
+        sel, ok = QtWidgets.QInputDialog.getItem(
+            self,
+            "Please select labeling group",
+            "Please select a group for labeling",
+            groups,
+            editable=False)
+        if ok:
+            self.settings.setValue("labeling group", sel)
+            QtWidgets.QMessageBox.information(
+                self,
+                "DCTag will now quit",
+                "In order for the changes to take effect, "
+                + "please restart DCTag."
+            )
+            if self.session_close():
+                QtCore.QCoreApplication.quit()
 
     @QtCore.pyqtSlot()
     def on_action_software(self):

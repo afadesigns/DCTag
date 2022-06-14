@@ -1,5 +1,7 @@
+0.5.0
+ - feat: allow to specify different labeling groups
 0.4.3
- - enh: add icon for dctag program
+ - docs: add DCTag icon
 0.4.2
  - fix: reduce labeling lag by downsampling scatter plot (#31)
  - feat: add jump-to-event option via spinBox (#30)

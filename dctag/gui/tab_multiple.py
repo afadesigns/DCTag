@@ -110,9 +110,12 @@ class TabMultiClassLabel(QtWidgets.QWidget):
         self.session = None
         self.event_index = 0
 
+        self.settings = QtCore.QSettings()
+
         # populate ML scores combobox
         self.comboBox_score.clear()
-        for feat in scores.get_dctag_score_dict("blood"):
+        for feat in scores.get_dctag_label_dict(
+                name=self.settings.value("labeling group", "ml_scores_blood")):
             self.comboBox_score.addItem(scores.get_feature_label(feat), feat)
 
         # signals

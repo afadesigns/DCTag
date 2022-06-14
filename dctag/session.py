@@ -384,10 +384,12 @@ class DCTagSession:
         -----
         This method is thread-safe.
         """
-        if (not feature.startswith("ml_score_") or
-                len(feature) != len("ml_score_???")):
+        if (not (feature.startswith("userdef")
+                 or (feature.startswith("ml_score_") and
+                     len(feature) == len("ml_score_???")))):
             raise ValueError(
-                f"Expected 'ml_score_xxx' feature, got '{feature}'!")
+                "Expected 'ml_score_xxx' or 'userdef*' feature, "
+                + f"got '{feature}'!")
         with self.score_lock:
             self.assert_session_open(f"set the score {feature} at {index}",
                                      strict=True)

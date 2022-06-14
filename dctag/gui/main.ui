@@ -63,7 +63,7 @@
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
-     <string>Help</string>
+     <string>&amp;Help</string>
     </property>
     <addaction name="actionSoftware"/>
     <addaction name="actionAbout"/>
@@ -77,7 +77,14 @@
     <addaction name="separator"/>
     <addaction name="actionBackupSession"/>
    </widget>
+   <widget class="QMenu" name="menuPreferences">
+    <property name="title">
+     <string>&amp;Preferences</string>
+    </property>
+    <addaction name="actionSelectLabels"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuPreferences"/>
    <addaction name="menuSession"/>
    <addaction name="menuHelp"/>
   </widget>
@@ -120,6 +127,11 @@
   <action name="actionBackupSession">
    <property name="text">
     <string>&amp;Backup session</string>
+   </property>
+  </action>
+  <action name="actionSelectLabels">
+   <property name="text">
+    <string>Select labeling group...</string>
    </property>
   </action>
  </widget>

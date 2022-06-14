@@ -1,3 +1,4 @@
+import atexit
 import shutil
 import tempfile
 import time
@@ -24,14 +25,13 @@ def pytest_configure(config):
     settings = QtCore.QSettings()
     settings.setValue("user/name", "dctag-tester")
     settings.setValue("debug/without timers", "1")
+    atexit.register(shutil.rmtree, TMPDIR, ignore_errors=True)
 
 
 def pytest_unconfigure(config):
     """
     called before test process is exited.
     """
-    shutil.rmtree(TMPDIR, ignore_errors=True)
-
     QtCore.QCoreApplication.setOrganizationName("MPL")
     QtCore.QCoreApplication.setOrganizationDomain("mpl.mpg.de")
     QtCore.QCoreApplication.setApplicationName("dctag")
