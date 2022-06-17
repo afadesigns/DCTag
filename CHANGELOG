@@ -1,3 +1,6 @@
+0.5.1
+ - fix: previous labels not displayed for user-defined features
+ - setup: bump dclab from 0.39.7 to 0.42.3
 0.5.0
  - feat: allow to specify different labeling groups
 0.4.3

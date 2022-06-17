@@ -561,6 +561,21 @@ def test_session_get_scores_true_basic():
         assert dts.get_scores_true(4) == []
 
 
+def test_session_get_scores_true_basic_userdef():
+    path = get_clean_data_path()
+    with session.DCTagSession(path, "Peter") as dts:
+        dts.set_score("userdef1", 0, True)
+        dts.set_score("userdef1", 2, True)
+        dts.set_score("userdef1", 3, True)
+        dts.set_score("userdef2", 3, True)
+
+        assert dts.get_scores_true(0) == ["userdef1"]
+        assert dts.get_scores_true(1) == []
+        assert dts.get_scores_true(2) == ["userdef1"]
+        assert dts.get_scores_true(3) == ["userdef1", "userdef2"]
+        assert dts.get_scores_true(4) == []
+
+
 def test_session_get_scores_true_linked():
     path = get_clean_data_path()
     with session.DCTagSession(path, "Peter") as dts:

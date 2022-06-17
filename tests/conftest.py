@@ -25,6 +25,7 @@ def pytest_configure(config):
     settings = QtCore.QSettings()
     settings.setValue("user/name", "dctag-tester")
     settings.setValue("debug/without timers", "1")
+    settings.setValue("labeling group", "ml_scores_blood")
     atexit.register(shutil.rmtree, TMPDIR, ignore_errors=True)
 
 

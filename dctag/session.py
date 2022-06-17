@@ -123,7 +123,7 @@ class DCTagSession:
         with h5py.File(self.path, "a") as h5:
             # make a copy of all available scores in self.scores_cache
             for feat in h5["events"]:
-                if feat.startswith("ml_score_"):
+                if feat.startswith("ml_score_") or feat.startswith("userdef"):
                     self.scores_cache[feat] = np.copy(h5["events"][feat])
 
         # finally, acquire the file system lock

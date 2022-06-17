@@ -24,16 +24,28 @@ def get_dctag_label_dict(name="ml_scores_blood"):
     return score_dict
 
 
-def get_feature_label(feature):
-    score_dict = get_dctag_label_dict(name="ml_scores_blood")
-    if feature in score_dict:
-        return score_dict[feature]["label"]
+def get_feature_label(feature, label_group=None):
+    default_label = dclab.dfn.get_feature_label(feature)
+    if label_group is None:
+        # go through all label groups
+        for group in get_available_label_groups():
+            label = get_feature_label(feature, group)
+            if label != default_label:
+                break
+        else:
+            label = default_label
     else:
-        return dclab.dfn.get_feature_label(feature)
+        # use this specific label group
+        score_dict = get_dctag_label_dict(name=label_group)
+        if feature in score_dict:
+            label = score_dict[feature]["label"]
+        else:
+            label = default_label
+    return label
 
 
-def get_feature_shortcut(feature):
-    score_dict = get_dctag_label_dict(name="ml_scores_blood")
+def get_feature_shortcut(feature, label_group="ml_scores_blood"):
+    score_dict = get_dctag_label_dict(name=label_group)
     if feature in score_dict:
         return score_dict[feature]["shortcut"]
     else:

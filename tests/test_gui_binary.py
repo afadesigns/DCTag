@@ -105,6 +105,46 @@ def test_goto_event_button_labels(qtbot):
     mw.close()
 
 
+def test_goto_event_button_labels_userdef(qtbot):
+    settings = QtCore.QSettings()
+    settings.setValue("labeling group", "userdef")
+
+    path = get_clean_data_path()
+    with session.DCTagSession(path, "dctag-tester") as dts:
+        dts.set_score("userdef1", 0, True)
+        dts.set_score("userdef1", 1, False)
+        dts.set_score("userdef1", 2, True)
+        dts.set_score("userdef1", 3, False)
+
+    mw = DCTag()
+    qtbot.addWidget(mw)
+    QtWidgets.QApplication.setActiveWindow(mw)
+    mw.on_action_open(path)
+    # select binary tab
+    mw.tabWidget.setCurrentIndex(1)
+    idx = mw.tab_binary.comboBox_score.findData("userdef1")
+    mw.tab_binary.comboBox_score.setCurrentIndex(idx)
+
+    qtbot.mouseClick(mw.tab_binary.pushButton_start, QtCore.Qt.LeftButton)
+
+    # The first event should be displayed, and it should be set to True
+    assert mw.tab_binary.pushButton_yes.text() == "[Yes]"
+    assert mw.tab_binary.pushButton_no.text() == "No"
+    assert mw.tab_binary.label_score_prev.text() == ""
+    assert mw.tab_binary.label_score_next.text() == "No"
+
+    # click on next.
+    qtbot.mouseClick(mw.tab_binary.pushButton_next, QtCore.Qt.LeftButton)
+
+    # This should be False now
+    assert mw.tab_binary.pushButton_yes.text() == "Yes"
+    assert mw.tab_binary.pushButton_no.text() == "[No]"
+    assert mw.tab_binary.label_score_prev.text() == "Yes"
+    assert mw.tab_binary.label_score_next.text() == "Yes"
+    mw.close()
+    settings.setValue("labeling group", "ml_scores_blood")
+
+
 def test_event_push_buttons(qtbot):
     path = get_clean_data_path()
     with session.DCTagSession(path, "dctag-tester") as dts:

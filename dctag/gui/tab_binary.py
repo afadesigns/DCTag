@@ -150,6 +150,7 @@ class TabBinaryLabel(QtWidgets.QWidget):
         self.progressBar.setVisible(True)
         self.widget_label_keys.setEnabled(True)
         main = QtWidgets.QApplication.activeWindow()
+        assert self.feature is not None, "feature not set!"
         label = scores.get_feature_label(self.feature)
         main.set_title(f"{self.feature[-3:].upper()}: {label}")
 
