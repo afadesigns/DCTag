@@ -165,10 +165,10 @@ def test_lock_in_twice(qtbot):
 
     qtbot.mouseClick(mw.tab_multiple.pushButton_start, QtCore.Qt.LeftButton)
 
-    br1f, br1u, br20 = mw.tab_multiple.label_buttons
+    br1f, br1u, br1n = mw.tab_multiple.label_buttons
     assert br1f.pushButton.text() == "[R1F]"
     assert br1u.pushButton.text() == "!R1U"  # because it auto-filled!
-    assert br20.pushButton.text() == "!R20"  # because it auto-filled!
+    assert br1n.pushButton.text() == "!R1N"  # because it auto-filled!
     mw.close()
 
 

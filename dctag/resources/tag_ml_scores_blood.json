@@ -7,6 +7,10 @@
     "label": "RBC singlet unfocused",
     "shortcut": "Ctrl+R"
     },
+  "ml_score_r1n": {
+    "label": "Nucleated RBC",
+    "shortcut": "Ctrl+N"
+    },
   "ml_score_r20": {
     "label": "RBC doublet",
     "shortcut": "Shift+2"
@@ -86,5 +90,9 @@
   "ml_score_buk": {
     "label": "Other/unknown",
     "shortcut": "U"
+    },
+  "ml_score_n10": {
+    "label": "RBC Nucleus",
+    "shortcut": "C"
     }
 }
