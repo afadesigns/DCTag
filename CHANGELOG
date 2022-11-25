@@ -1,4 +1,5 @@
 0.5.2
+ - enh: add stiff RBC class to labels
  - enh: add NRBC class to labels
 0.5.1
  - fix: previous labels not displayed for user-defined features

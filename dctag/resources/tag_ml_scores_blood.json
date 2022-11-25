@@ -11,6 +11,10 @@
     "label": "Nucleated RBC",
     "shortcut": "Ctrl+N"
     },
+  "ml_score_r1s": {
+    "label": "RBC singlet stiff",
+    "shortcut": "Ctrl+S"
+    },
   "ml_score_r20": {
     "label": "RBC doublet",
     "shortcut": "Shift+2"

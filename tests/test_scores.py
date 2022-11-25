@@ -1,3 +1,5 @@
+import re
+
 from dctag import scores
 
 import pytest
@@ -30,6 +32,24 @@ def test_get_feature_label(feat, label):
 ])
 def test_get_feature_shortcut(label, feat, shortcut):
     assert scores.get_feature_shortcut(feat, label) == shortcut
+
+
+def test_correct_ml_score_feat():
+    blood = scores.get_dctag_label_dict(name="ml_scores_blood")
+    pattern = re.compile("^ml_score_[a-z0-9]{3}$")
+    for feat in blood.keys():
+        assert pattern.match(feat), (f"Feature name '{feat}' does not match "
+                                     "'ml_score_???'-pattern. Only lower case "
+                                     "alphanumeric values allowed!")
+
+
+def test_correct_ml_scores_format():
+    blood = scores.get_dctag_label_dict(name="ml_scores_blood")
+    for feat, feat_dict in blood.items():
+        assert "label" in feat_dict, (f"Label entry missing for feature "
+                                      f"'{feat}'!")
+        assert "shortcut" in feat_dict, (f"Shortcut entry missing for feature "
+                                         f"'{feat}'!")
 
 
 def test_unique_score_labels():
