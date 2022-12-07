@@ -55,6 +55,10 @@
     "label": "WBC singlet Monocytes",
     "shortcut": "M"
     },
+  "ml_score_w20": {
+    "label": "WBC doublet",
+    "shortcut": "Ctrl+W"
+    },
   "ml_score_wn0": {
     "label": "WBC multiple",
     "shortcut": "Shift+W"
@@ -67,6 +71,22 @@
     "label": "Thrombocyte singlet unfocused",
     "shortcut": "Ctrl+T"
     },
+  "ml_score_t1r": {
+    "label": "Thrombocyte and RBC",
+    "shortcut": "Ctrl+3"
+    },
+  "ml_score_t1w": {
+    "label": "Thrombocyte and WBC",
+    "shortcut": "Ctrl+2"
+    },
+  "ml_score_tnr": {
+    "label": "Multiple thrombocytes and one RBC",
+    "shortcut": "Ctrl+Z"
+    },
+  "ml_score_tnw": {
+    "label": "Multiple thrombocytes and one WBC",
+    "shortcut": "Ctrl+V"
+    },
   "ml_score_tn0": {
     "label": "Thrombocyte multiple",
     "shortcut": "Shift+T"
@@ -78,6 +98,18 @@
   "ml_score_m30": {
     "label": "Mixed cell triplet",
     "shortcut": "Alt+3"
+    },
+  "ml_score_m3r": {
+    "label": "Mixed triplet: 2 RBCs with 1 WBC",
+    "shortcut": "Ctrl+M"
+    },
+  "ml_score_m3w": {
+    "label": "Mixed triplet: 1 RBC with 2 WBCs",
+    "shortcut": "Shift+M"
+    },
+  "ml_score_mnt": {
+    "label": "(Mixed) doublet with thrombocyte(s)",
+    "shortcut": "Alt+M"
     },
   "ml_score_mn0": {
     "label": "Mixed cell multiple",
