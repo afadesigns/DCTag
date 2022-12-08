@@ -27,13 +27,13 @@
     "label": "RBC multiple",
     "shortcut": "Shift+R"
     },
-  "ml_score_l10": {
-    "label": "WBC singlet Lymphocytes",
-    "shortcut": "L"
-    },
   "ml_score_w10": {
     "label": "WBC singlet",
     "shortcut": "W"
+    },
+  "ml_score_l10": {
+    "label": "WBC singlet Lymphocytes",
+    "shortcut": "L"
     },
   "ml_score_g10": {
     "label": "WBC singlet Granulomonocyte",
@@ -55,6 +55,10 @@
     "label": "WBC singlet Monocytes",
     "shortcut": "M"
     },
+  "ml_score_w20": {
+    "label": "WBC doublet",
+    "shortcut": "Ctrl+W"
+    },
   "ml_score_wn0": {
     "label": "WBC multiple",
     "shortcut": "Shift+W"
@@ -67,21 +71,53 @@
     "label": "Thrombocyte singlet unfocused",
     "shortcut": "Ctrl+T"
     },
+  "ml_score_t1r": {
+    "label": "Thrombocyte and RBC",
+    "shortcut": "Ctrl+3"
+    },
+  "ml_score_t1w": {
+    "label": "Thrombocyte and WBC",
+    "shortcut": "Ctrl+2"
+    },
   "ml_score_tn0": {
     "label": "Thrombocyte multiple",
     "shortcut": "Shift+T"
+    },
+  "ml_score_tnr": {
+    "label": "Thrombocyte multiple and one RBC",
+    "shortcut": "Ctrl+Z"
+    },
+  "ml_score_tnw": {
+    "label": "Thrombocyte multiple and one WBC",
+    "shortcut": "Ctrl+V"
     },
   "ml_score_m20": {
     "label": "Mixed cell doublet",
     "shortcut": "Alt+2"
     },
+  "ml_score_mnt": {
+    "label": "(Mixed) cell doublet with thrombocyte(s)",
+    "shortcut": "Alt+M"
+    },
   "ml_score_m30": {
     "label": "Mixed cell triplet",
     "shortcut": "Alt+3"
     },
+  "ml_score_m3r": {
+    "label": "Mixed cell triplet: 2 RBCs with 1 WBC",
+    "shortcut": "Ctrl+M"
+    },
+  "ml_score_m3w": {
+    "label": "Mixed cell triplet: 1 RBC with 2 WBCs",
+    "shortcut": "Shift+M"
+    },
   "ml_score_mn0": {
     "label": "Mixed cell multiple",
     "shortcut": "Alt+0"
+    },
+  "ml_score_n10": {
+    "label": "RBC Nucleus",
+    "shortcut": "C"
     },
   "ml_score_ds0": {
     "label": "Small debris",
@@ -94,9 +130,5 @@
   "ml_score_buk": {
     "label": "Other/unknown",
     "shortcut": "U"
-    },
-  "ml_score_n10": {
-    "label": "RBC Nucleus",
-    "shortcut": "C"
     }
 }
