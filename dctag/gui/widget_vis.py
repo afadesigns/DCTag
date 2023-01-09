@@ -186,6 +186,9 @@ class WidgetVisualize(QtWidgets.QWidget):
         """Set the fluorescence traces on the widget"""
         with dclab.new_dataset(self.session.path) as ds:
             if "trace" in ds:
+                # clear Legend
+                self.legend_trace.clear()
+                self.legend_trace.setVisible(True)
                 # time axis
                 fl_samples = ds.config["fluorescence"]["samples per event"]
                 fl_rate = ds.config["fluorescence"]["sample rate"]
@@ -194,8 +197,7 @@ class WidgetVisualize(QtWidgets.QWidget):
                 range_t = [fl_time[0], fl_time[-1], 0]
                 # fluorescence intensity
                 range_fl = [0, 0]
-                # clear Legend
-                self.legend_trace.clear()
+
                 for key in dclab.dfn.FLUOR_TRACES:
                     if key in ds["trace"]:
                         # show the trace information
