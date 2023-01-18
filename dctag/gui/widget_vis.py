@@ -54,6 +54,17 @@ class WidgetVisualize(QtWidgets.QWidget):
             left="FL [a.u.]", bottom="Event time [µs]")
         self.legend_trace = self.widget_trace.addLegend(
             offset=(-.005, +.005), labelTextSize='7pt', colCount=2)
+
+        for key in self.trace_plots:
+            self.widget_trace.addItem(self.trace_plots[key])
+            self.trace_plots[key].hide()
+            # set legend name
+            ln = "{} {}".format(
+                "FL-{}".format(key[2]),
+                'median' if str(key[4]) == 'm' else 'raw')
+            self.legend_trace.addItem(self.trace_plots[key], ln)
+            self.legend_trace.update()
+
         # linked axes
         for ii, plota in enumerate(self.scatter_plots):
             vba = plota.getViewBox()
@@ -89,6 +100,7 @@ class WidgetVisualize(QtWidgets.QWidget):
             self.image_channel_contour.clear()
             self.image_cropped.clear()
             self.widget_trace.clear()
+            self.legend_trace.clear()
             for plot in self.scatter_plots:
                 plot.set_scatter(np.arange(10), np.arange(10))
 
@@ -132,10 +144,6 @@ class WidgetVisualize(QtWidgets.QWidget):
             # cropped image
             image_cropped = get_cropped_image(data)
             self.update_image_cropped(image_cropped)
-
-            for key in self.trace_plots:
-                self.widget_trace.addItem(self.trace_plots[key])
-                self.trace_plots[key].hide()
 
             # Plot event in the scatter plots
             for plot, [featx, featy] in zip(self.scatter_plots, SCATTER_FEAT):
@@ -206,12 +214,6 @@ class WidgetVisualize(QtWidgets.QWidget):
                         range_fl[1] = max(range_fl[1], tracey.max())
                         self.trace_plots[key].setData(fl_time, tracey)
                         self.trace_plots[key].show()
-                        # set legend name
-                        ln = "{} {}".format(
-                            "FL-{}".format(key[2]),
-                            'median' if str(key[4]) == 'm' else 'raw')
-                        self.legend_trace.addItem(self.trace_plots[key], ln)
-                        self.legend_trace.update()
                     else:
                         self.trace_plots[key].hide()
                 self.widget_trace.setXRange(*range_t[:2], padding=0)

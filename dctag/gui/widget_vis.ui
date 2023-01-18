@@ -37,7 +37,7 @@
      <property name="title">
       <string>Event event_index (total total_session_event_count)</string>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout" stretch="6,4">
+     <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
