@@ -55,6 +55,7 @@ class SimplePlotWidget(pg.PlotWidget):
                                                background=background,
                                                plotItem=plot_item)
 
+
 class SimpleViewBox(pg.ViewBox):
     export = QtCore.pyqtSignal(str)
 
@@ -66,4 +67,3 @@ class SimpleViewBox(pg.ViewBox):
         if int(settings.value("advanced/developer mode", 0)):
             # Enable advanced export in developer mode
             self.right_click_actions["Export..."] = "Advanced Export"
-
