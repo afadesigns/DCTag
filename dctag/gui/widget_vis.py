@@ -84,9 +84,6 @@ class WidgetVisualize(QtWidgets.QWidget):
         self.spinBox_contrast_min.valueChanged.connect(
             self.update_image_cropped)
 
-        # set initial empty dataset
-        self.slot = None
-
     def reset(self, reset_plots=False):
         """Clear current visualization"""
         # clear the event image cache
@@ -194,9 +191,6 @@ class WidgetVisualize(QtWidgets.QWidget):
         """Set the fluorescence traces on the widget"""
         with dclab.new_dataset(self.session.path) as ds:
             if "trace" in ds:
-                # clear Legend
-                self.legend_trace.clear()
-                self.legend_trace.setVisible(True)
                 # time axis
                 fl_samples = ds.config["fluorescence"]["samples per event"]
                 fl_rate = ds.config["fluorescence"]["sample rate"]
