@@ -96,8 +96,6 @@ class WidgetVisualize(QtWidgets.QWidget):
             self.image_channel.clear()
             self.image_channel_contour.clear()
             self.image_cropped.clear()
-            self.widget_trace.clear()
-            self.legend_trace.clear()
             for plot in self.scatter_plots:
                 plot.set_scatter(np.arange(10), np.arange(10))
 
