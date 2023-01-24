@@ -84,9 +84,6 @@ class WidgetVisualize(QtWidgets.QWidget):
         self.spinBox_contrast_min.valueChanged.connect(
             self.update_image_cropped)
 
-        # set initial empty dataset
-        self.slot = None
-
     def reset(self, reset_plots=False):
         """Clear current visualization"""
         # clear the event image cache
