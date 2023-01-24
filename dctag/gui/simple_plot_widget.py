@@ -86,25 +86,3 @@ class SimpleViewBox(pg.ViewBox):
         if int(settings.value("advanced/developer mode", 0)):
             # Enable advanced export in developer mode
             self.right_click_actions["Export..."] = "Advanced Export"
-
-    def raiseContextMenu(self, ev):
-        # Let the scene add on to the end of our context menu
-        menu = self.scene().addParentContextMenus(self, self.menu, ev)
-
-        # Only keep list of actions defined in `self.right_click_actions`
-        for action in self.menu.actions():
-            if action.text() in self.right_click_actions.values():
-                pass
-            elif action.text() not in self.right_click_actions:
-                self.menu.removeAction(action)
-            else:
-                action.setText(self.right_click_actions[action.text()])
-
-        menu.addAction("Export subplot as PNG",
-                       lambda: self.export.emit("png"))
-        menu.addAction("Export subplot as SVG",
-                       lambda: self.export.emit("svg"))
-
-        pos = ev.screenPos()
-        menu.popup(QtCore.QPoint(pos.x(), pos.y()))
-        return True
