@@ -1,3 +1,6 @@
+0.6.0
+ - feat: show fluorescence traces
+ - setup: bump pyqtgraph from 0.12.3 to 0.13.1
 0.5.4
  - enh: add new RBC single class ("round")
 0.5.3

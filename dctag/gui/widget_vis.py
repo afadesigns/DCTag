@@ -1,11 +1,11 @@
 import functools
 import pkg_resources
 
+import dclab
 import numpy as np
 from PyQt5 import QtCore, QtWidgets, uic
+import pyqtgraph as pg
 from scipy.ndimage import binary_erosion
-
-import dclab
 
 
 #: dictionary with default axes limits for these features
@@ -40,6 +40,25 @@ class WidgetVisualize(QtWidgets.QWidget):
 
         self.scatter_plots = [self.scatter_1, self.scatter_2, self.scatter_3,
                               self.scatter_4]
+        # Set individual plots
+        kw0 = dict(x=np.arange(10), y=np.arange(10))
+        self.trace_plots = {
+            "fl1_raw": pg.PlotDataItem(pen="#15BF00", **kw0),  # green
+            "fl2_raw": pg.PlotDataItem(pen="#BF8A00", **kw0),  # orange
+            "fl3_raw": pg.PlotDataItem(pen="#BF0C00", **kw0),  # red
+            "fl1_median": pg.PlotDataItem(pen="#15BF00", **kw0),  # green
+            "fl2_median": pg.PlotDataItem(pen="#BF8A00", **kw0),  # orange
+            "fl3_median": pg.PlotDataItem(pen="#BF0C00", **kw0),  # red
+        }
+        self.widget_trace.plotItem.setLabels(bottom="Event time [µs]")
+        self.legend_trace = self.widget_trace.addLegend(
+            offset=(+.001, -.001), labelTextSize='7pt', colCount=1)
+
+        self.trace_plot_legends = {}
+
+        for key in self.trace_plots:
+            self.widget_trace.addItem(self.trace_plots[key])
+            self.trace_plots[key].hide()
 
         # linked axes
         for ii, plota in enumerate(self.scatter_plots):
@@ -72,6 +91,11 @@ class WidgetVisualize(QtWidgets.QWidget):
             self.image_channel.clear()
             self.image_channel_contour.clear()
             self.image_cropped.clear()
+            self.legend_trace.clear()
+            for key in self.trace_plots:
+                line = self.trace_plots[key]
+                line.setData(np.arange(10), np.arange(10))
+                self.widget_trace.update()
             for plot in self.scatter_plots:
                 plot.set_scatter(np.arange(10), np.arange(10))
 
@@ -115,9 +139,13 @@ class WidgetVisualize(QtWidgets.QWidget):
             # cropped image
             image_cropped = get_cropped_image(data)
             self.update_image_cropped(image_cropped)
+
             # Plot event in the scatter plots
             for plot, [featx, featy] in zip(self.scatter_plots, SCATTER_FEAT):
                 plot.set_event(data[featx], data[featy])
+
+            # Add the Fluorescence traces of the event
+            self.set_fluorescence_traces(event_index)
 
     @QtCore.pyqtSlot()
     def update_image_cropped(self, image_cropped=None):
@@ -156,6 +184,49 @@ class WidgetVisualize(QtWidgets.QWidget):
                 plot.setYRange(*LIMITS_FEAT[featy])
             plot.setLabel('bottom', dclab.dfn.get_feature_label(featx))
             plot.setLabel('left', dclab.dfn.get_feature_label(featy))
+
+    def set_fluorescence_traces(self, event_index):
+        """Set the fluorescence traces on the widget"""
+        self.legend_trace.clear()
+        with dclab.new_dataset(self.session.path) as ds:
+            if "trace" in ds:
+                self.widget_trace.show()
+                # time axis
+                fl_samples = ds.config["fluorescence"]["samples per event"]
+                fl_rate = ds.config["fluorescence"]["sample rate"]
+                fl_time = np.arange(fl_samples) / fl_rate * 1e6
+                # temporal range (min, max, fl-peak-maximum)
+                range_t = [fl_time[0], fl_time[-1], 0]
+                # fluorescence intensity
+                range_fl = [0, 0]
+
+                # Use this list to only show one trace type (raw or median)
+                shown_traces = []
+
+                for key in dclab.dfn.FLUOR_TRACES:
+                    trid = key.split("_")[0]
+                    if key in ds["trace"] and trid not in shown_traces:
+                        shown_traces.append(trid)
+                        # show the trace information
+                        tracey = ds["trace"][key][event_index]  # trace data
+                        range_fl[0] = min(range_fl[0], tracey.min())
+                        range_fl[1] = max(range_fl[1], tracey.max())
+                        self.trace_plots[key].setData(fl_time, tracey)
+                        self.trace_plots[key].show()
+                        # set legend name
+                        ln = "{} {}".format(
+                            "FL-{}".format(key[2]),
+                            'median' if str(key[4]) == 'm' else 'raw')
+                        self.legend_trace.addItem(self.trace_plots[key], ln)
+                        self.legend_trace.update()
+                    else:
+                        self.trace_plots[key].hide()
+                self.widget_trace.setXRange(*range_t[:2], padding=0)
+                if range_fl[0] != range_fl[1]:
+                    self.widget_trace.setYRange(*range_fl, padding=.01)
+                self.widget_trace.setLimits(xMin=0, xMax=fl_time[-1])
+            else:
+                self.widget_trace.hide()
 
 
 def get_contour_image(event_data):

@@ -25,7 +25,7 @@ setup(
                       "h5py>=3.0.0",
                       "numpy>=1.21",
                       "pyqt5",
-                      "pyqtgraph==0.12.3",
+                      "pyqtgraph==0.13.1",
                       ],
     python_requires='>=3.8, <4',
     entry_points={"gui_scripts": ['dctag = dctag.__main__:main']},
