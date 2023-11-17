@@ -169,8 +169,8 @@ class DCTagSession:
                         if override_user:
                             h5["logs"][dctag_history][0] = f"user: {self.user}"
                             hw.store_log(dctag_history,
-                                         f"Session reclaimed from {h5user} "
-                                         f"by {self.user}.")
+                                         f"Session force-claimed from "
+                                         f"{h5user} by {self.user}.")
                         else:
                             raise DCTagSessionWrongUserError(
                                 h5user,
