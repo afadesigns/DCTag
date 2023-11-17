@@ -1,5 +1,6 @@
 0.7.0
  - feat: allow to claim a session by another user
+ - enh: show ml_score identifiers in dropdown lists
  - setup: bump dclab to 0.55.6
 0.6.1
  - enh: add new thrombocyte-cluster classes

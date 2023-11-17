@@ -116,7 +116,8 @@ class TabMultiClassLabel(QtWidgets.QWidget):
         self.comboBox_score.clear()
         for feat in scores.get_dctag_label_dict(
                 name=self.settings.value("labeling group", "ml_scores_blood")):
-            self.comboBox_score.addItem(scores.get_feature_label(feat), feat)
+            flabel = f"{scores.get_feature_label(feat)} [{feat[-3:].upper()}]"
+            self.comboBox_score.addItem(flabel, feat)
 
         # signals
         self.pushButton_start.clicked.connect(self.on_start)
