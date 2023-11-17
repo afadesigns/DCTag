@@ -39,10 +39,13 @@ class DCTagSessionWriteError(DCTagSessionError):
 
 class DCTagSessionWrongUserError(DCTagSessionError):
     """Raised when the session user does not match"""
+    def __init__(self, olduser, *args):
+        self.olduser = olduser
+        super(DCTagSessionWrongUserError, self).__init__(*args)
 
 
 class DCTagSession:
-    def __init__(self, path, user, linked_features=None):
+    def __init__(self, path, user, linked_features=None, override_user=False):
         """Initialize a DCTag session
 
         Parameters
@@ -68,6 +71,8 @@ class DCTagSession:
             Thus, if you are using this feature for labeling multiple
             scores, make sure to always only set True scores (so the
             other scores get set to False).
+        override_user: bool
+            Whether to override the `user` stored in the session.
 
         Notes
         -----
@@ -103,7 +108,7 @@ class DCTagSession:
         # list of linked features (see self.linked_features)
         self._linked_features = []
         # claim this file
-        self._claim_path()
+        self._claim_path(override_user=override_user)
         #: simple key-value dictionary of the current session history
         self.history = {}
         #: list of (feature, index, score) in the order set by the user
@@ -141,31 +146,40 @@ class DCTagSession:
     def __exit__(self, type, value, traceback):
         self.close()
 
-    def _claim_path(self):
+    def _claim_path(self, override_user=False):
         """Attribute this file to self.user"""
         with h5py.File(self.path, "a") as h5:
-            if "dctag-history" in h5.require_group("logs"):
-                if len(h5["logs"]["dctag-history"]) == 0:
-                    # We have an empty log, replace it.
-                    hw = dclab.RTDCWriter(h5, mode="replace")
-                    hw.store_log("dctag-history", f"user: {self.user}")
-                else:
-                    h5userstr = h5["logs"]["dctag-history"][0]
-                    if isinstance(h5userstr, bytes):
-                        h5userstr = h5userstr.decode("utf-8")
-                    if h5userstr.startswith("user:"):
-                        h5user = h5userstr.split(":")[1].strip()
-                        if h5user != self.user:
+            hw = dclab.RTDCWriter(h5, mode="append")
+            h5.require_group("logs")
+            dctag_history = "dctag-history"
+            if len(h5["logs"].get(dctag_history, ["placeholder"])) == 0:
+                # remove empty logs
+                del h5["logs"][dctag_history]
+
+            if dctag_history not in h5["logs"]:
+                hw.store_log(dctag_history, f"user: {self.user}")
+            else:
+                # Check whether the user in the file matches us
+                h5userstr = h5["logs"][dctag_history][0]
+                if isinstance(h5userstr, bytes):
+                    h5userstr = h5userstr.decode("utf-8")
+                if h5userstr.startswith("user:"):
+                    h5user = h5userstr.split(":")[1].strip()
+                    if h5user != self.user:
+                        if override_user:
+                            h5["logs"][dctag_history][0] = f"user: {self.user}"
+                            hw.store_log(dctag_history,
+                                         f"Session reclaimed from {h5user} "
+                                         f"by {self.user}.")
+                        else:
                             raise DCTagSessionWrongUserError(
+                                h5user,
                                 f"Expected user '{self.user}' in "
                                 + f"'{self.path}', got '{h5user}'!")
-                    else:
-                        # Something went wrong (maybe lost history).
-                        # Reinstate the claim!
-                        h5["logs"]["dctag-history"][0] = f"user: {self.user}"
-            else:
-                with dclab.RTDCWriter(h5) as hw:
-                    hw.store_log("dctag-history", f"user: {self.user}")
+                else:
+                    # Something went wrong (maybe lost history).
+                    # Reinstate the claim!
+                    h5["logs"]["dctag-history"][0] = f"user: {self.user}"
 
     @property
     def linked_features(self):

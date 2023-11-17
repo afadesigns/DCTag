@@ -21,7 +21,7 @@ setup(
     license="None",
     description=description,
     long_description=open('README.rst').read() if exists('README.rst') else '',
-    install_requires=["dclab>=0.42.3",
+    install_requires=["dclab>=0.55.6",
                       "h5py>=3.0.0",
                       "numpy>=1.21",
                       "pyqt5",
@@ -36,4 +36,3 @@ setup(
                  ],
     platforms=['ALL']
 )
-

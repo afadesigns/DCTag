@@ -546,6 +546,24 @@ def test_session_error_wronguser():
             pass
 
 
+def test_session_error_wronguser_override():
+    path = get_clean_data_path()
+    with session.DCTagSession(path, "Peter"):
+        pass
+
+    with session.DCTagSession(path, "Hans", override_user=True):
+        pass
+
+    with h5py.File(path) as h5:
+        assert h5["logs/dctag-history"][0].decode("utf8") == "user: Hans"
+        for line in h5["logs/dctag-history"][:]:
+            line = line.decode("utf-8")
+            if line.count("Session reclaimed from Peter by Hans."):
+                break
+        else:
+            assert False, "session-claim string missing in log"
+
+
 def test_session_get_scores_true_basic():
     path = get_clean_data_path()
     with session.DCTagSession(path, "Peter") as dts:

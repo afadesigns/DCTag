@@ -300,7 +300,7 @@ class DCTag(QtWidgets.QMainWindow):
                     f"The file '{path_rtdc}' is not (yet) a DCTag session. "
                     + "Would you like to claim this file? If you select "
                     + "'Yes', this file will be tied to your username/alias. "
-                    + "This cannot be undone. You may alternatively select "
+                    + "You may alternatively select "
                     + "'No' and open a copy of that file instead."
                 )
                 cont = reply == QtWidgets.QMessageBox.Yes
@@ -310,18 +310,23 @@ class DCTag(QtWidgets.QMainWindow):
                                                         user=user,
                                                         linked_features=[])
                 except session.DCTagSessionWrongUserError as e:
-                    QtWidgets.QMessageBox.warning(
+                    reply_claim = QtWidgets.QMessageBox.question(
                         self,
-                        "Cannot load session",
-                        "You are trying to open a session from another user. "
-                        + "This is not supported yet. These are the details: "
-                        + "<br><br>"
-                        + e.args[-1]
+                        f"Claim this file from {e.olduser}?",
+                        f"This session is already claimed by {e.olduser}. "
+                        f"Do you wish to force-claim this session anyway?"
                     )
-                else:
-                    # Go to session tab and update info
-                    self.tabWidget.setCurrentIndex(0)
-                    self.on_tab_changed()
+                    if reply_claim == QtWidgets.QMessageBox.Yes:
+                        self.session = session.DCTagSession(path=path_rtdc,
+                                                            user=user,
+                                                            linked_features=[],
+                                                            override_user=True)
+                    else:
+                        # Don't do anything further here.
+                        return
+                # Go to session tab and update info
+                self.tabWidget.setCurrentIndex(0)
+                self.on_tab_changed()
 
     def set_title(self, task=None):
         if task is None:
