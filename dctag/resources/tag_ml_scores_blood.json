@@ -84,7 +84,7 @@
     "shortcut": "Ctrl+V"
     },
   "ml_score_tnm": {
-    "label": "Thrombocyte(s) with two or more cells",
+    "label": "Thrombocyte clot and WBC(s) and RBC(s)",
     "shortcut": "Alt+M"
     },
   "ml_score_mn0": {
