@@ -4,6 +4,7 @@
  - setup: publish code on GitHub
  - setup: add GPLv3 license
  - setup: bump dclab to 0.67.1
+ - setup: bump pyqtgraph to 0.13.7
 0.7.1
  - ref: correct cell class description in json file
 0.7.0
