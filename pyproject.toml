@@ -28,7 +28,7 @@ classifiers = [
 ]
 license = "GPL-3.0-or-later"
 dependencies = [
-    "dclab>=0.55.6",
+    "dclab>=0.67.1",
     "h5py>=3.0.0",
     "numpy>=1.21",
     "pyqt5",
