@@ -31,7 +31,7 @@ dependencies = [
     "dclab>=0.67.1",
     "h5py>=3.0.0",
     "numpy>=1.21",
-    "pyqt5",
+    "pyqt6",
     "pyqtgraph==0.13.7",
 ]
 dynamic = ["version"]

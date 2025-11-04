@@ -2,11 +2,11 @@ def main():
     import importlib.resources
     import sys
 
-    from PyQt5.QtWidgets import QApplication
+    from PyQt6.QtWidgets import QApplication
 
     app = QApplication(sys.argv)
 
-    from PyQt5 import QtCore, QtGui
+    from PyQt6 import QtCore, QtGui
     from .gui import DCTag
 
     # Set Application Icon

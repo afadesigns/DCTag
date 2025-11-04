@@ -6,7 +6,7 @@ from unittest import mock
 import h5py
 import numpy as np
 import pytest
-from PyQt5 import QtCore, QtWidgets
+from PyQt6 import QtCore, QtWidgets
 
 import dctag
 from dctag import session

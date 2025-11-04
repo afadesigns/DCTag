@@ -6,7 +6,7 @@ import time
 from dctag.gui.main import DCTag
 
 import pytest
-from PyQt5 import QtCore, QtWidgets
+from PyQt6 import QtCore, QtWidgets
 
 TMPDIR = tempfile.mkdtemp(prefix=time.strftime(
     "dctag_test_%H.%M_"))
