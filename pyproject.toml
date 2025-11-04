@@ -18,7 +18,7 @@ authors = [
 maintainers = [
     {name = "Paul Müller", email="dev@craban.de"},
 ]
-description = "Annotate .rtdc files for machine-learning training in deformability cytometry"
+description = "GUI for ground truth generation from .rtdc files for machine-learning-based event classification in deformability cytometry"
 requires-python = ">=3.10, <4"
 keywords = ["RT-DC", "DC", "deformability", "cytometry", "machine-learning"]
 classifiers = [
