@@ -5,7 +5,6 @@ import pytest
 
 from dctag import session
 from .helper import get_clean_data_path
-from .helper import mw as _mw  # noqa: F401
 
 
 data_dir = pathlib.Path(__file__).parent / "data"

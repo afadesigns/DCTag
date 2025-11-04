@@ -3,10 +3,34 @@ import shutil
 import tempfile
 import time
 
-from PyQt5 import QtCore
+from dctag.gui.main import DCTag
+
+import pytest
+from PyQt5 import QtCore, QtWidgets
 
 TMPDIR = tempfile.mkdtemp(prefix=time.strftime(
     "dctag_test_%H.%M_"))
+
+
+@pytest.fixture
+def mw(qtbot):
+    # Always set server correctly, because there is a test that
+    # makes sure DCOR-Aid starts with a wrong server.
+    QtWidgets.QApplication.processEvents(
+        QtCore.QEventLoop.ProcessEventsFlag.AllEvents, 200)
+    # Code that will run before your test
+    mw = DCTag()
+    qtbot.addWidget(mw)
+    QtWidgets.QApplication.setActiveWindow(mw)
+    QtWidgets.QApplication.processEvents(
+        QtCore.QEventLoop.ProcessEventsFlag.AllEvents, 200)
+    # Run test
+    yield mw
+    # Make sure that all daemons are gone
+    mw.close()
+    # It is extremely weird, but this seems to be important to avoid segfaults!
+    QtWidgets.QApplication.processEvents(
+        QtCore.QEventLoop.ProcessEventsFlag.AllEvents, 200)
 
 
 def pytest_configure(config):
