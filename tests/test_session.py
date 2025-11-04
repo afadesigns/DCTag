@@ -29,12 +29,12 @@ def test_is_dctag_session():
 def test_flush_with_missing_file_error():
     path = get_clean_data_path()
     # error should be raised on flush and on __exit__
-    with pytest.raises(session.DCTagSessionWriteError, match=f"{path}"):
+    with pytest.raises(session.DCTagSessionWriteError, match=fr"{path}"):
         with session.DCTagSession(path, "Peter") as dts:
             dts.set_score("ml_score_abc", 0, True)
             path.unlink()
             with pytest.raises(session.DCTagSessionWriteError,
-                               match=f"{path}"):
+                               match=fr"{path}"):
                 dts.flush()
 
 
@@ -529,7 +529,7 @@ def test_session_error_locked():
     lock_path = path.with_suffix(".dctag")
     lock_path.touch()
     # make sure the session cannot be opened if it is locked
-    with pytest.raises(session.DCTagSessionLockedError, match=f"{path}"):
+    with pytest.raises(session.DCTagSessionLockedError, match=fr"{path}"):
         with session.DCTagSession(path, "Peter"):
             pass
     # make sure the lock file is not removed by context manager
