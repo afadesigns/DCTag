@@ -6,7 +6,7 @@ import time
 from dctag.gui.main import DCTag
 
 import pytest
-from PyQt5 import QtCore, QtWidgets
+from PyQt6 import QtCore, QtWidgets
 
 TMPDIR = tempfile.mkdtemp(prefix=time.strftime(
     "dctag_test_%H.%M_"))
@@ -34,33 +34,30 @@ def mw(qtbot):
 
 
 def pytest_configure(config):
-    """
-    Allows plugins and conftest files to perform initial configuration.
-    This hook is called for every plugin and initial conftest
-    file after command line options have been parsed.
-    """
-    tempfile.tempdir = TMPDIR
-
-    # Default settings
+    """With this trick, we can access the settings from all tests"""
+    # The idea is to create a QApplication instance that is used
+    # to instantiate the settings.
+    app = QtWidgets.QApplication.instance()
+    if app is None:
+        app = QtWidgets.QApplication([])
+    # Some promoted widgets need the below constants set in order
+    # to access the settings upon initialization.
     QtCore.QCoreApplication.setOrganizationName("MPL")
     QtCore.QCoreApplication.setOrganizationDomain("dc-cosmos.org")
-    QtCore.QCoreApplication.setApplicationName("dctag")
-    QtCore.QSettings.setDefaultFormat(QtCore.QSettings.IniFormat)
+    QtCore.QCoreApplication.setApplicationName("dctag-testing")
+    QtCore.QSettings.setDefaultFormat(QtCore.QSettings.Format.IniFormat)
+    # The settings are not used here, but this is the place where
+    # they are created.
     settings = QtCore.QSettings()
-    settings.setValue("user/name", "dctag-tester")
-    settings.setValue("debug/without timers", "1")
-    settings.setValue("labeling group", "ml_scores_blood")
-    atexit.register(shutil.rmtree, TMPDIR, ignore_errors=True)
+    settings.clear()
 
 
 def pytest_unconfigure(config):
-    """
-    called before test process is exited.
-    """
+    """Restore the settings"""
+    # restore dctag-tester for other tests
     QtCore.QCoreApplication.setOrganizationName("MPL")
     QtCore.QCoreApplication.setOrganizationDomain("dc-cosmos.org")
     QtCore.QCoreApplication.setApplicationName("dctag")
-    QtCore.QSettings.setDefaultFormat(QtCore.QSettings.IniFormat)
+    QtCore.QSettings.setDefaultFormat(QtCore.QSettings.Format.IniFormat)
     settings = QtCore.QSettings()
-    settings.remove("user/name")
-    settings.remove("debug/without timers")
+    settings.clear()

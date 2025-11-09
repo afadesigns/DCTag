@@ -5,29 +5,22 @@ import signal
 import sys
 import time
 import traceback
-
 import dclab
 import h5py
 import numpy
-from PyQt5 import uic, QtCore, QtWidgets
+from PyQt6 import uic, QtCore, QtWidgets
 import pyqtgraph as pg
-
 from .. import scores
 from .. import session
 from .._version import version
-
-
 # global plotting configuration parameters
 pg.setConfigOption("background", None)
 pg.setConfigOption("foreground", "k")
 pg.setConfigOption("antialias", True)
 pg.setConfigOption("imageAxisOrder", "row-major")
-
-
 class DCTag(QtWidgets.QMainWindow):
     def __init__(self):
         super(DCTag, self).__init__()
-
         # Settings are stored in the .ini file format. Even though
         # `self.settings` may return integer/bool in the same session,
         # in the next session, it will reliably return strings. Lists
@@ -37,15 +30,12 @@ class DCTag(QtWidgets.QMainWindow):
         QtCore.QCoreApplication.setOrganizationName("MPL")
         QtCore.QCoreApplication.setOrganizationDomain("dc-cosmos.org")
         QtCore.QCoreApplication.setApplicationName("dctag")
-        QtCore.QSettings.setDefaultFormat(QtCore.QSettings.IniFormat)
-
+        QtCore.QSettings.setDefaultFormat(QtCore.QSettings.Format.IniFormat)
         # if "--version" was specified, print the version and exit
         if "--version" in sys.argv:
-            print(version)
             QtWidgets.QApplication.processEvents(
-                QtCore.QEventLoop.AllEvents, 300)
+                QtCore.QEventLoop.ProcessEventsFlag.AllEvents, 300)
             sys.exit(0)
-
         #: DCOR-Aid settings
         self.settings = QtCore.QSettings()
         username = self.settings.value("user/name", None)
@@ -67,12 +57,10 @@ class DCTag(QtWidgets.QMainWindow):
                 # Abort
                 sys.exit(0)
         self.settings.setValue("user/name", username)
-
         # initialize UI
         ref = importlib.resources.files("dctag.gui") / "main.ui"
         with importlib.resources.as_file(ref) as path_ui:
             uic.loadUi(path_ui, self)
-
         self.set_title()
         # Disable native menubar (e.g. on Mac)
         self.menubar.setNativeMenuBar(False)
@@ -88,17 +76,13 @@ class DCTag(QtWidgets.QMainWindow):
         # Help menu
         self.actionSoftware.triggered.connect(self.on_action_software)
         self.actionAbout.triggered.connect(self.on_action_about)
-
         # tabwidget
         self.tabWidget.currentChanged.connect(self.on_tab_changed)
-
         #: holds the current DCTagSession instance
         self.session = None
-
         self.show()
         self.raise_()
         self.activateWindow()
-
         # flush session regularly
         if bool(int(self.settings.value("debug/without timers", "0"))):
             self.timer = None
@@ -106,20 +90,17 @@ class DCTag(QtWidgets.QMainWindow):
             self.timer = QtCore.QTimer()
             self.timer.timeout.connect(self.session_flush_statusbar)
             self.timer.start(60000)
-
     def closeEvent(self, event):
         if self.session_close():
             event.accept()
         else:
             event.ignore()
-
     def dragEnterEvent(self, e):
         """Whether files are accepted"""
         if e.mimeData().hasUrls():
             e.accept()
         else:
             e.ignore()
-
     def dropEvent(self, e):
         """Add dropped files to view"""
         urls = e.mimeData().urls()
@@ -129,12 +110,10 @@ class DCTag(QtWidgets.QMainWindow):
         elif urls:
             pp = pathlib.Path(urls[0].toLocalFile())
             self.session_open(pp)
-
     @QtCore.pyqtSlot()
     def on_action_about(self):
         about_text = "DCTag: Annotate .rtdc files for ML training"
         QtWidgets.QMessageBox.about(self, f"DCTag {version}", about_text)
-
     @QtCore.pyqtSlot()
     def on_action_backup(self):
         """Create an .rtdc file with the current history and score cache"""
@@ -171,19 +150,16 @@ class DCTag(QtWidgets.QMainWindow):
                 + "file (if that still exists). Close DCTag now?")
             if reply2 == QtWidgets.QMessageBox.Yes:
                 self.on_action_quit(force=True)
-
     @QtCore.pyqtSlot()
     def on_action_close(self):
         self.session_close()
         # Go to session tab and update info
         self.tabWidget.setCurrentIndex(0)
         self.on_tab_changed()
-
     @QtCore.pyqtSlot()
     def on_action_flush(self):
         if self.session:
             self.session.flush()
-
     @QtCore.pyqtSlot()
     def on_action_open(self, path=None):
         if path is None:
@@ -196,12 +172,10 @@ class DCTag(QtWidgets.QMainWindow):
             self.settings.setValue(
                 "paths/open", str(pathlib.Path(path).parent))
             self.session_open(path)
-
     @QtCore.pyqtSlot()
     def on_action_quit(self, force=True):
         if force or self.session_close():
             QtCore.QCoreApplication.quit()
-
     @QtCore.pyqtSlot()
     def on_action_select_labels(self):
         """Let the user select a labeling group"""
@@ -223,7 +197,6 @@ class DCTag(QtWidgets.QMainWindow):
             )
             if self.session_close():
                 QtCore.QCoreApplication.quit()
-
     @QtCore.pyqtSlot()
     def on_action_software(self):
         libs = [dclab,
@@ -235,19 +208,17 @@ class DCTag(QtWidgets.QMainWindow):
         sw_text += "Modules:\n"
         for lib in libs:
             sw_text += "- {} {}\n".format(lib.__name__, lib.__version__)
-        sw_text += "- PyQt5 {}\n".format(QtCore.QT_VERSION_STR)
+        sw_text += "- PyQt6 {}\n".format(QtCore.QT_VERSION_STR)
         if hasattr(sys, 'frozen'):
             sw_text += "\nThis executable has been created using PyInstaller."
         QtWidgets.QMessageBox.information(self,
                                           "Software",
                                           sw_text)
-
     @QtCore.pyqtSlot()
     def on_tab_changed(self):
         curtab = self.tabWidget.currentWidget()
         curtab.update_session(self.session)
         self.set_title()
-
     def session_close(self):
         if not self.session:
             success = True
@@ -268,11 +239,9 @@ class DCTag(QtWidgets.QMainWindow):
                 self.session = None
                 success = True
         return success
-
     @QtCore.pyqtSlot()
     def session_flush_statusbar(self):
         """Flush the session, writing all changes to the file
-
         If any errors occur, this is written to the status bar.
         """
         if self.session:
@@ -286,7 +255,6 @@ class DCTag(QtWidgets.QMainWindow):
             else:
                 self.statusBar().showMessage(f"{date} Session flushed.", 3000)
                 self.statusBar().setStyleSheet("")
-
     def session_open(self, path_rtdc):
         """Load an .rtdc file into the user interface"""
         if self.session_close():
@@ -330,19 +298,15 @@ class DCTag(QtWidgets.QMainWindow):
                 # Go to session tab and update info
                 self.tabWidget.setCurrentIndex(0)
                 self.on_tab_changed()
-
     def set_title(self, task=None):
         if task is None:
             title = f"DCTag {version}"
         else:
             title = f"{task} [DCTag {version}]"
         self.setWindowTitle(title)
-
-
 def excepthook(etype, value, trace):
     """
     Handler for all unhandled exceptions.
-
     :param `etype`: the exception type (`SyntaxError`,
         `ZeroDivisionError`, etc...);
     :type `etype`: `Exception`
@@ -354,8 +318,6 @@ def excepthook(etype, value, trace):
     vinfo = f"Unhandled exception in DCTag version {version}:\n"
     tmp = traceback.format_exception(etype, value, trace)
     exception = "".join([vinfo]+tmp)
-    print(exception)
-
     errorbox = QtWidgets.QMessageBox()
     errorbox.setIcon(QtWidgets.QMessageBox.Critical)
     errorbox.addButton(QtWidgets.QPushButton('Close'),
@@ -368,8 +330,6 @@ def excepthook(etype, value, trace):
         cb = QtWidgets.QApplication.clipboard()
         cb.clear(mode=cb.Clipboard)
         cb.setText(exception)
-
-
 # Make Ctr+C close the app
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 # Display exception hook in separate dialog instead of crashing

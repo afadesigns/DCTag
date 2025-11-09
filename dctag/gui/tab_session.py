@@ -1,6 +1,6 @@
 import importlib.resources
 
-from PyQt5 import QtWidgets, uic
+from PyQt6 import QtWidgets, uic
 
 import dclab
 

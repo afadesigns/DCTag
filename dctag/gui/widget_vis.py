@@ -3,7 +3,7 @@ import importlib.resources
 
 import dclab
 import numpy as np
-from PyQt5 import QtCore, QtWidgets, uic
+from PyQt6 import QtCore, QtWidgets, uic
 import pyqtgraph as pg
 from scipy.ndimage import binary_erosion
 

@@ -1,6 +1,6 @@
 import pathlib
 
-from PyQt5 import QtCore, QtWidgets
+from PyQt6 import QtCore, QtWidgets
 import pytest
 
 from dctag import session
@@ -13,7 +13,7 @@ data_dir = pathlib.Path(__file__).parent / "data"
 @pytest.fixture(autouse=True)
 def run_around_tests():
     # Code that will run before your test
-    QtWidgets.QApplication.processEvents(QtCore.QEventLoop.AllEvents, 3000)
+    QtWidgets.QApplication.processEvents(QtCore.QEventLoop.ProcessEventsFlag.AllEvents, 3000)
     pass
     # A test function will be run at this point
     yield
@@ -25,7 +25,7 @@ def run_around_tests():
     QtCore.QSettings.setDefaultFormat(QtCore.QSettings.IniFormat)
     settings = QtCore.QSettings()
     settings.setValue("user/name", "dctag-tester")
-    QtWidgets.QApplication.processEvents(QtCore.QEventLoop.AllEvents, 3000)
+    QtWidgets.QApplication.processEvents(QtCore.QEventLoop.ProcessEventsFlag.AllEvents, 3000)
 
 
 def test_error_session(qtbot, mw):
